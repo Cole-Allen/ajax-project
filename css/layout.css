@@ -1,0 +1,22 @@
+.container {
+  margin: 0 auto;
+  max-width: 1280px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.row {
+  display: flex;
+  flex-basis: 100%;
+}
+
+.row-header {
+  align-items: center;
+}
+
+.grid {
+  margin: 20px 10px;
+  display: flex;
+  flex-wrap: wrap;
+}
