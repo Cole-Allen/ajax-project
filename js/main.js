@@ -15,10 +15,20 @@ function loadCatPhotos() {
 
   data.entries.push(cellData);
   data.entries[data.nextID].cell.addEventListener('click', function (event) {
-    for (var i = 0; i < data.entries.length; i++) {
-      if (data.entries[i].ID.toString() === event.currentTarget.getAttribute('cell-id')) {
-        data.favorites.push(data.entries[i]);
-        console.log(data);
+    console.log(event.target);
+    if (event.target.getAttribute('icon') === 'heart') {
+      for (var i = 0; i < data.entries.length; i++) {
+        if (data.entries[i].ID.toString() === event.currentTarget.getAttribute('cell-id') && !data.favorites.includes(data.entries[i])) {
+          data.favorites.push(data.entries[i]);
+          event.target.classList.remove('far');
+          event.target.classList.add('fas');
+          console.log(data);
+        } else if (data.entries[i].ID.toString() === event.currentTarget.getAttribute('cell-id') && data.favorites.includes(data.entries[i])) {
+          data.favorites.splice(data.favorites.indexOf(data.entries[i]), 1);
+          event.target.classList.remove('fas');
+          event.target.classList.add('far');
+          console.log(data);
+        }
       }
     }
   });
