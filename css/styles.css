@@ -27,6 +27,7 @@ a {
 
 .image-cell {
   flex-basis: 25%;
+  max-width: 315px;
   aspect-ratio: 1/1;
   padding: 10px;
 }
@@ -39,12 +40,11 @@ a {
 }
 
 .image-box img {
-  transition: transform 3s;
+  transition: transform 1s;
   transform: scale(1);
 }
 
 .image-box img:hover {
-  transition: transform 2s;
   transform: scale(1.2);
 }
 
