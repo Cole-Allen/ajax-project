@@ -14,24 +14,8 @@ function loadCatPhotos() {
   var cellData = createImageCell(translatedJSON.file, data.nextID);
 
   data.entries.push(cellData);
-  data.entries[data.nextID].cell.addEventListener('click', function (event) {
-    console.log(event.target);
-    if (event.target.getAttribute('icon') === 'heart') {
-      for (var i = 0; i < data.entries.length; i++) {
-        if (data.entries[i].ID.toString() === event.currentTarget.getAttribute('cell-id') && !data.favorites.includes(data.entries[i])) {
-          data.favorites.push(data.entries[i]);
-          event.target.classList.remove('far');
-          event.target.classList.add('fas');
-          console.log(data);
-        } else if (data.entries[i].ID.toString() === event.currentTarget.getAttribute('cell-id') && data.favorites.includes(data.entries[i])) {
-          data.favorites.splice(data.favorites.indexOf(data.entries[i]), 1);
-          event.target.classList.remove('fas');
-          event.target.classList.add('far');
-          console.log(data);
-        }
-      }
-    }
-  });
+  data.entries[data.nextID].cell.addEventListener('click', cellEventListener);
+  data.entries[data.nextID].imageNode.addEventListener('click', whenImageClicked);
   data.nextID++;
 
   $imagegrid.appendChild(cellData.cell);
@@ -72,48 +56,39 @@ function createImageCell(imageURL, id) {
   cellData.ID = id;
   cellData.cell = $imageCell;
   cellData.favorite = false;
+  cellData.imageNode = $image;
 
   return cellData;
 
 }
-$imagegrid.addEventListener('click', function (event) {
-  console.log('click');
-});
-// $imagegrid.addEventListener('click', function (event) {
-//   var selectedCell = null;
-//   console.log(event.target);
 
-//   for (var i = 0; i < $allCells.length; i++) {
-//     if (event.target.parentNode.parentNode.parentNode.parentNode.getAttribute('cell-id') === data.entries[i].ID.toString()) {
-//       selectedCell = data.entries[i];
-//     }
-//   }
-//   if (event.target === 'balah') {
-//     var $modalImage = $modal.querySelector('img');
-//     $modalImage.setAttribute('src', selectedCell.imageURL);
-//     modalHandler(selectedCell);
-//     $modal.classList.remove('hidden');
-//   }
+function cellEventListener(event) {
+  console.log(event.target);
 
-//   console.log(selectedCell);
-//   if (event.target.getAttribute('icon') === 'heart' && !data.favorites.includes(selectedCell)) {
+  // Handle favorites in 'cell' view
+  if (event.target.getAttribute('icon') === 'heart') {
+    for (var i = 0; i < data.entries.length; i++) {
+      if (data.entries[i].ID.toString() === event.currentTarget.getAttribute('cell-id') && !data.favorites.includes(data.entries[i])) {
+        data.favorites.push(data.entries[i]);
+        event.target.classList.remove('far');
+        event.target.classList.add('fas');
+      } else if (data.entries[i].ID.toString() === event.currentTarget.getAttribute('cell-id') && data.favorites.includes(data.entries[i])) {
+        data.favorites.splice(data.favorites.indexOf(data.entries[i]), 1);
+        event.target.classList.remove('fas');
+        event.target.classList.add('far');
+      }
+    }
+  }
+}
 
-//     data.favorites.push(selectedCell);
-//     event.target.classList.remove('far');
-//     event.target.classList.add('fas');
-//   } else if (event.target.getAttribute('icon') === 'heart' && data.favorites.includes(selectedCell)) {
-//     for (var j = 0; j < data.favorites.length; j++) {
-//       console.log(data.favorites[j].ID);
-//       if (data.favorites[j].ID === selectedCell.ID) {
-//         data.favorites.splice(j, 1);
-//       }
-//     }
-//     event.target.classList.remove('fas');
-//     event.target.classList.add('far');
-//   }
-// });
+function whenImageClicked(event) {
+  $modal.classList.remove('hidden');
+  $modal.querySelector('img').setAttribute('src', event.target.getAttribute('src'));
+  modalHandler();
 
-function modalHandler(targetCell) {
+}
+
+function modalHandler() {
   var $heart = $modal.querySelector('.fa-heart');
   $modal.addEventListener('click', function (event) {
     if (event.target === $modal.querySelector('.fa-times-circle')) {
