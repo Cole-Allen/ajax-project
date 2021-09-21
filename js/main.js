@@ -1,12 +1,12 @@
 var $imagegrid = document.querySelector('.grid');
 var $modal = document.querySelector('.modal');
-var $allCells = document.querySelectorAll('.image-cell');
 
 for (var i = 0; i < 20; i++) {
   var catPhotos = new XMLHttpRequest();
   catPhotos.addEventListener('load', loadCatPhotos);
   catPhotos.open('GET', 'https://aws.random.cat/meow');
   catPhotos.send();
+
 }
 
 function loadCatPhotos() {
@@ -14,9 +14,18 @@ function loadCatPhotos() {
   var cellData = createImageCell(translatedJSON.file, data.nextID);
 
   data.entries.push(cellData);
+  data.entries[data.nextID].cell.addEventListener('click', function (event) {
+    for (var i = 0; i < data.entries.length; i++) {
+      if (data.entries[i].ID.toString() === event.currentTarget.getAttribute('cell-id')) {
+        data.favorites.push(data.entries[i]);
+        console.log(data);
+      }
+    }
+  });
   data.nextID++;
 
   $imagegrid.appendChild(cellData.cell);
+
 }
 
 function createImageCell(imageURL, id) {
@@ -57,40 +66,42 @@ function createImageCell(imageURL, id) {
   return cellData;
 
 }
-
 $imagegrid.addEventListener('click', function (event) {
-  var selectedCell = null;
-  console.log(event.target);
-
-  for (var i = 0; i < $allCells.length; i++) {
-    if (event.target.parentNode.parentNode.parentNode.parentNode.getAttribute('cell-id') === data.entries[i].ID.toString()) {
-      selectedCell = data.entries[i];
-    }
-  }
-  if (event.target === 'balah') {
-    var $modalImage = $modal.querySelector('img');
-    $modalImage.setAttribute('src', selectedCell.imageURL);
-    modalHandler(selectedCell);
-    $modal.classList.remove('hidden');
-  }
-
-  console.log(selectedCell);
-  if (event.target.getAttribute('icon') === 'heart' && !data.favorites.includes(selectedCell)) {
-
-    data.favorites.push(selectedCell);
-    event.target.classList.remove('far');
-    event.target.classList.add('fas');
-  } else if (event.target.getAttribute('icon') === 'heart' && data.favorites.includes(selectedCell)) {
-    for (var j = 0; j < data.favorites.length; j++) {
-      console.log(data.favorites[j].ID);
-      if (data.favorites[j].ID === selectedCell.ID) {
-        data.favorites.splice(j, 1);
-      }
-    }
-    event.target.classList.remove('fas');
-    event.target.classList.add('far');
-  }
+  console.log('click');
 });
+// $imagegrid.addEventListener('click', function (event) {
+//   var selectedCell = null;
+//   console.log(event.target);
+
+//   for (var i = 0; i < $allCells.length; i++) {
+//     if (event.target.parentNode.parentNode.parentNode.parentNode.getAttribute('cell-id') === data.entries[i].ID.toString()) {
+//       selectedCell = data.entries[i];
+//     }
+//   }
+//   if (event.target === 'balah') {
+//     var $modalImage = $modal.querySelector('img');
+//     $modalImage.setAttribute('src', selectedCell.imageURL);
+//     modalHandler(selectedCell);
+//     $modal.classList.remove('hidden');
+//   }
+
+//   console.log(selectedCell);
+//   if (event.target.getAttribute('icon') === 'heart' && !data.favorites.includes(selectedCell)) {
+
+//     data.favorites.push(selectedCell);
+//     event.target.classList.remove('far');
+//     event.target.classList.add('fas');
+//   } else if (event.target.getAttribute('icon') === 'heart' && data.favorites.includes(selectedCell)) {
+//     for (var j = 0; j < data.favorites.length; j++) {
+//       console.log(data.favorites[j].ID);
+//       if (data.favorites[j].ID === selectedCell.ID) {
+//         data.favorites.splice(j, 1);
+//       }
+//     }
+//     event.target.classList.remove('fas');
+//     event.target.classList.add('far');
+//   }
+// });
 
 function modalHandler(targetCell) {
   var $heart = $modal.querySelector('.fa-heart');
