@@ -40,20 +40,21 @@ a {
 }
 
 .image-box {
-  width: 100%;
-  height: 100%;
-  position: relative;
+  background: #00ab7d;
+  border-radius: 20px;
   overflow: hidden;
 }
 
 .image-box img {
-  transition: transform 1s;
-  transform: scale(1);
+  width: 100%;
+
+  /* transition: transform 1s;
+  transform: scale(1); */
 }
 
-.image-box img:hover {
+/* .image-box img:hover {
   transform: scale(1.2);
-}
+} */
 
 .cell-image {
   display: block;
@@ -67,14 +68,8 @@ a {
   display: flex;
   justify-content: right;
   align-items: end;
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  right: 0;
-  left: 0;
-  background: linear-gradient(0deg, rgba(0, 0, 0, 0.582), rgba(0, 0, 0, 0));
   font-size: 2rem;
-  padding: 20px 10px;
+  padding: 10px 10px;
 }
 
 .image-overlay a {
@@ -104,4 +99,8 @@ a {
   margin-top: 40px;
   font-size: 4rem;
   justify-content: space-between;
+}
+
+.faved {
+  color: rgb(255, 58, 101);
 }

@@ -107,7 +107,7 @@ function createImageCell(imageURL, id, favorited) {
 
   if (favorited) {
     $pen.setAttribute('class', 'fas fa-pen');
-    $heart.setAttribute('class', 'fas fa-heart');
+    $heart.setAttribute('class', 'fas fa-heart faved');
   } else {
     $pen.setAttribute('class', 'fas fa-pen');
     $heart.setAttribute('class', 'far fa-heart');
@@ -137,10 +137,12 @@ function cellEventListener(event) { //! !!!!! Need to fix so that it works witho
         catImages.entries[i].favorited = true;
         event.target.classList.remove('far');
         event.target.classList.add('fas');
+        event.target.classList.add('faved');
       } else if (catImages.entries[i].ID.toString() === event.currentTarget.getAttribute('cell-id') && data.favorites.includes(catImages.entries[i])) {
         data.favorites.splice(data.favorites.indexOf(catImages.entries[i]), 1);
         catImages.entries[i].favorited = false;
         event.target.classList.remove('fas');
+        event.target.classList.remove('faved');
         event.target.classList.add('far');
       }
     }
@@ -167,8 +169,10 @@ function modalHandler(targetCell) {
   if (data.favorites.includes(targetCell)) {
     $heart.classList.remove('far');
     $heart.classList.add('fas');
+    $heart.classList.add('faved');
   } else {
     $heart.classList.remove('fas');
+    $heart.classList.remove('faved');
     $heart.classList.add('far');
   }
   $modal.addEventListener('click', function (event) {
@@ -180,13 +184,16 @@ function modalHandler(targetCell) {
       event.target.favorited = true;
       $cellHeart.classList.remove('far');
       $cellHeart.classList.add('fas');
+      $cellHeart.classList.add('faved');
       $heart.classList.remove('far');
       $heart.classList.add('fas');
+      $heart.classList.add('faved');
     } else if (event.target === $heart && data.favorites.includes(targetCell)) {
       event.target.favorited = false;
       data.favorites.splice(data.favorites.indexOf(targetCell), 1);
       $heart.classList.add('far');
       $heart.classList.remove('fas');
+      $heart.classList.remove('faved');
     }
   });
 }
