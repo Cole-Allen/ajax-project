@@ -1,3 +1,6 @@
+var $headerLogo = document.querySelector('.header-logo');
+var $headerFavorites = document.querySelector('.header-favorites');
+
 var $imagegrid = document.querySelector('.grid');
 var $modal = document.querySelector('.modal');
 
@@ -14,7 +17,7 @@ function loadCatPhotos() {
   var cellData = createImageCell(translatedJSON.file, data.nextID);
 
   data.entries.push(cellData);
-  data.entries[data.nextID].cell.addEventListener('click', cellEventListener);
+  data.entries[data.entries.length - 1].cell.addEventListener('click', cellEventListener);
   data.nextID++;
 
   $imagegrid.appendChild(cellData.cell);
@@ -63,7 +66,7 @@ function createImageCell(imageURL, id) {
 }
 
 function cellEventListener(event) {
-  console.log(event.currentTarget);
+  console.log('current Target', event.currentTarget);
 
   // Handle favorites in 'cell' view
   if (event.target.getAttribute('icon') === 'heart') {
@@ -89,6 +92,7 @@ function cellEventListener(event) {
 }
 
 function whenImageClicked(url, targetCell) {
+  console.log(targetCell);
   $modal.classList.remove('hidden');
   $modal.querySelector('img').setAttribute('src', url);
   modalHandler(targetCell);
@@ -97,12 +101,22 @@ function whenImageClicked(url, targetCell) {
 
 function modalHandler(targetCell) {
   var $heart = $modal.querySelector('.fa-heart');
+  var $cellHeart = targetCell.cell.querySelector('.fa-heart');
+  if (data.favorites.includes(targetCell)) {
+    $heart.classList.remove('far');
+    $heart.classList.add('fas');
+  } else {
+    $heart.classList.remove('fas');
+    $heart.classList.add('far');
+  }
   $modal.addEventListener('click', function (event) {
     if (event.target === $modal.querySelector('.fa-times-circle')) {
       $modal.classList.add('hidden');
     }
     if (event.target === $heart && !data.favorites.includes(targetCell)) {
       data.favorites.push(targetCell);
+      $cellHeart.classList.remove('far');
+      $cellHeart.classList.add('fas');
       $heart.classList.remove('far');
       $heart.classList.add('fas');
     } else if (event.target === $heart && data.favorites.includes(targetCell)) {
