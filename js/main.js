@@ -35,17 +35,20 @@ function getRandomImages(amount) {
 function loadCatPhotos() {
 
   var translatedJSON = JSON.parse(this.responseText);
-  var cell = createImageCell(translatedJSON.file, data.nextID, false);
+
   var cellData = {};
   cellData.ID = data.nextID; // The Cell ID
   cellData.imageURL = translatedJSON.file; // The Image URL
   for (var i = 0; i < data.favorites.length; i++) {
     if (cellData.imageURL === data.favorites[i].imageURL) {
+      console.log('favorited');
       cellData.favorited = true;
+      break;
     } else {
       cellData.favorited = false;
     }
   }
+  var cell = createImageCell(translatedJSON.file, data.nextID, cellData.favorited);
   cellData.cell = cell; // The cell that shows up on the grid.Needed to get the heart on the grid view
 
   catImages.entries.push(cellData); // Shows current random entries. Length should not be larger than the amount parameter of the getRandomIMages function
@@ -128,7 +131,7 @@ function createImageCell(imageURL, id, favorited) {
 
 }
 
-function cellEventListener(event) { //! !!!!! Need to fix so that it works without relying on data.entries!!!!!!!!!!!
+function cellEventListener(event) {
   // Handle favorites in 'cell' view
   if (event.target.getAttribute('icon') === 'heart') {
     for (var i = 0; i < catImages.entries.length; i++) {
