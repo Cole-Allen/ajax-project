@@ -39,6 +39,7 @@ function createImageCell(imageURL, id) {
   $imageBox.setAttribute('class', 'image-box');
   $imageOverlay.setAttribute('class', 'image-overlay');
   $image.setAttribute('src', imageURL);
+  $image.setAttribute('class', 'cell-image');
   $image.setAttribute('image-id', id);
   $pen.setAttribute('icon', 'edit');
   $heart.setAttribute('icon', 'heart');

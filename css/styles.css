@@ -48,6 +48,13 @@ a {
   transform: scale(1.2);
 }
 
+.cell-image {
+  display: block;
+  object-fit: cover;
+  object-position: center;
+  height: 100%;
+}
+
 .image-overlay {
   pointer-events: none;
   display: flex;
@@ -67,18 +74,6 @@ a {
   pointer-events: initial;
 }
 
-@media screen and (max-width: 768px) {
-  .image-cell {
-    flex-basis: 50%;
-  }
-}
-
-@media screen and (max-width: 480px) {
-  .image-cell {
-    flex-basis: 100%;
-  }
-}
-
 .modal {
   position: fixed;
   top: 0;
@@ -91,14 +86,27 @@ a {
   justify-content: center;
   align-items: center;
   padding: 50px;
+  overflow: scroll;
 }
 
 .modal-image {
-  max-width: 600px;
+  max-width: 1500px;
 }
 
 .modal-icons {
   margin-top: 40px;
   font-size: 4rem;
   justify-content: space-between;
+}
+
+@media screen and (max-width: 768px) {
+  .image-cell {
+    flex-basis: 50%;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .image-cell {
+    flex-basis: 100%;
+  }
 }
