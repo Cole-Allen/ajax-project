@@ -1,9 +1,4 @@
 /* exported data */
-/* exported catImages */
-
-var catImages = {
-  entries: []
-};
 
 var data = {
   favorites: [],

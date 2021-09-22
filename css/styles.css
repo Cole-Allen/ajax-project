@@ -26,9 +26,6 @@ a {
 }
 
 .cell {
-  flex-basis: 25%;
-  max-width: 315px;
-  aspect-ratio: 1/1;
   padding: 10px;
 }
 
@@ -97,16 +94,4 @@ a {
   margin-top: 40px;
   font-size: 4rem;
   justify-content: space-between;
-}
-
-@media screen and (max-width: 768px) {
-  .image-cell {
-    flex-basis: 50%;
-  }
-}
-
-@media screen and (max-width: 480px) {
-  .image-cell {
-    flex-basis: 100%;
-  }
 }

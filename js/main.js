@@ -1,9 +1,14 @@
-/* imported catImages */
+var catImages = {
+  entries: []
+};
+
+var column = 0;
 
 var $headerLogo = document.querySelector('.header-logo');
 var $headerFavorites = document.querySelector('.header-favorites');
 
 var $imagegrid = document.querySelector('.grid');
+var $imageColumns = document.querySelectorAll('.column');
 var $modal = document.querySelector('.modal');
 
 getRandomImages(20); // Populates the page with 20 random images from the API
@@ -27,6 +32,7 @@ function getRandomImages(amount) {
 }
 
 function loadCatPhotos() {
+
   var translatedJSON = JSON.parse(this.responseText);
   var cell = createImageCell(translatedJSON.file, data.nextID, false);
   var cellData = {};
@@ -39,7 +45,30 @@ function loadCatPhotos() {
 
   data.nextID++; // Makes sure no cells share the same id
 
-  $imagegrid.appendChild(cell); // Adds the Cell to the grid view
+  // $imagegrid.appendChild(cell); // Adds the Cell to the grid view
+
+  switch (column) {
+    case 0:
+      $imageColumns[0].appendChild(cell);
+      console.log('1');
+      column++;
+      break;
+    case 1:
+      $imageColumns[1].appendChild(cell);
+      console.log('2');
+      column++;
+      break;
+    case 2:
+      $imageColumns[2].appendChild(cell);
+      console.log('3');
+      column++;
+      break;
+    case 3:
+      $imageColumns[3].appendChild(cell);
+      console.log('4');
+      column = 0;
+      break;
+  }
 
 }
 
@@ -90,7 +119,6 @@ function createImageCell(imageURL, id, favorited) {
 }
 
 function cellEventListener(event) { //! !!!!! Need to fix so that it works without relying on data.entries!!!!!!!!!!!
-  console.log(event.target);
   // Handle favorites in 'cell' view
   if (event.target.getAttribute('icon') === 'heart') {
     for (var i = 0; i < catImages.entries.length; i++) {
