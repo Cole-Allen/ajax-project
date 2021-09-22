@@ -2,7 +2,8 @@
 var data = {
   entries: [],
   favorites: [],
-  nextID: 0
+  nextID: 0,
+  view: null
 };
 
 window.addEventListener('beforeunload', function (event) {

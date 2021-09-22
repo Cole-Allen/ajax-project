@@ -4,29 +4,46 @@ var $headerFavorites = document.querySelector('.header-favorites');
 var $imagegrid = document.querySelector('.grid');
 var $modal = document.querySelector('.modal');
 
-for (var i = 0; i < 20; i++) {
-  var catPhotos = new XMLHttpRequest();
-  catPhotos.addEventListener('load', loadCatPhotos);
-  catPhotos.open('GET', 'https://aws.random.cat/meow');
-  catPhotos.send();
+getRandomImages(20); // Populates the page with 20 random images from the API
 
+$headerFavorites.addEventListener('click', function (event) {
+  switchViews('favorites');
+});
+
+$headerLogo.addEventListener('click', function (event) {
+  switchViews('buit');
+});
+
+function getRandomImages(amount) {
+  for (var i = 0; i < amount; i++) {
+    var catPhotos = new XMLHttpRequest();
+    catPhotos.addEventListener('load', loadCatPhotos);
+    catPhotos.open('GET', 'https://aws.random.cat/meow');
+    catPhotos.send();
+
+  }
 }
 
 function loadCatPhotos() {
   var translatedJSON = JSON.parse(this.responseText);
-  var cellData = createImageCell(translatedJSON.file, data.nextID);
+  var cell = createImageCell(translatedJSON.file, data.nextID, false);
+  var cellData = {};
+  cellData.ID = data.nextID; // The Cell ID
+  cellData.imageURL = translatedJSON.file; // The Image URL
+  cellData.favorited = false; // Lets the page know if the hearts should already be filled in
+  cellData.cell = cell; // The cell that shows up on the grid.Needed to get the heart on the grid view
 
-  data.entries.push(cellData);
-  data.entries[data.entries.length - 1].cell.addEventListener('click', cellEventListener);
-  data.nextID++;
+  data.entries.push(cellData); // Shows current random entries. Length should not be larger than the amount parameter of the getRandomIMages function
 
-  $imagegrid.appendChild(cellData.cell);
+  data.nextID++; // Makes sure no cells share the same id
+
+  $imagegrid.appendChild(cell); // Adds the Cell to the grid view
 
 }
 
-function createImageCell(imageURL, id) {
-  var cellData = {};
-  cellData.imageURL = imageURL;
+// Creates the Cell container in the DOM
+
+function createImageCell(imageURL, id, favorited) {
   var $cell = document.createElement('div');
   var $imageBox = document.createElement('div');
   var $imageOverlay = document.createElement('div');
@@ -46,8 +63,14 @@ function createImageCell(imageURL, id) {
   $image.setAttribute('image-id', id);
   $pen.setAttribute('icon', 'edit');
   $heart.setAttribute('icon', 'heart');
-  $pen.setAttribute('class', 'fas fa-pen');
-  $heart.setAttribute('class', 'far fa-heart');
+
+  if (favorited) {
+    $pen.setAttribute('class', 'fas fa-pen');
+    $heart.setAttribute('class', 'fas fa-heart');
+  } else {
+    $pen.setAttribute('class', 'fas fa-pen');
+    $heart.setAttribute('class', 'far fa-heart');
+  }
 
   $cell.appendChild($imageBox);
   $imageBox.appendChild($imgA);
@@ -57,26 +80,26 @@ function createImageCell(imageURL, id) {
   $imageOverlay.appendChild($heartA);
   $penA.appendChild($pen);
   $heartA.appendChild($heart);
-  cellData.ID = id;
-  cellData.cell = $cell;
-  cellData.favorite = false;
 
-  return cellData;
+  $cell.addEventListener('click', cellEventListener); // listens for clicks on the cell
+
+  return $cell;
 
 }
 
-function cellEventListener(event) {
-  console.log('current Target', event.currentTarget);
-
+function cellEventListener(event) { //! !!!!! Need to fix so that it works without relying on data.entries!!!!!!!!!!!
+  console.log(event.target);
   // Handle favorites in 'cell' view
   if (event.target.getAttribute('icon') === 'heart') {
     for (var i = 0; i < data.entries.length; i++) {
       if (data.entries[i].ID.toString() === event.currentTarget.getAttribute('cell-id') && !data.favorites.includes(data.entries[i])) {
         data.favorites.push(data.entries[i]);
+        data.entries[i].favorited = true;
         event.target.classList.remove('far');
         event.target.classList.add('fas');
       } else if (data.entries[i].ID.toString() === event.currentTarget.getAttribute('cell-id') && data.favorites.includes(data.entries[i])) {
         data.favorites.splice(data.favorites.indexOf(data.entries[i]), 1);
+        data.entries[i].favorited = false;
         event.target.classList.remove('fas');
         event.target.classList.add('far');
       }
@@ -92,7 +115,6 @@ function cellEventListener(event) {
 }
 
 function whenImageClicked(url, targetCell) {
-  console.log(targetCell);
   $modal.classList.remove('hidden');
   $modal.querySelector('img').setAttribute('src', url);
   modalHandler(targetCell);
@@ -101,7 +123,7 @@ function whenImageClicked(url, targetCell) {
 
 function modalHandler(targetCell) {
   var $heart = $modal.querySelector('.fa-heart');
-  var $cellHeart = targetCell.cell.querySelector('.fa-heart');
+  var $cellHeart = targetCell.cell.querySelector('.fa-heart'); // Links the heart effect to the grid view cell
   if (data.favorites.includes(targetCell)) {
     $heart.classList.remove('far');
     $heart.classList.add('fas');
@@ -115,14 +137,29 @@ function modalHandler(targetCell) {
     }
     if (event.target === $heart && !data.favorites.includes(targetCell)) {
       data.favorites.push(targetCell);
+      event.target.favorited = true;
       $cellHeart.classList.remove('far');
       $cellHeart.classList.add('fas');
       $heart.classList.remove('far');
       $heart.classList.add('fas');
     } else if (event.target === $heart && data.favorites.includes(targetCell)) {
+      event.target.favorited = false;
       data.favorites.splice(data.favorites.indexOf(targetCell), 1);
       $heart.classList.add('far');
       $heart.classList.remove('fas');
     }
   });
+}
+
+function switchViews(targetview) {
+  while ($imagegrid.firstChild) {
+    $imagegrid.removeChild($imagegrid.firstChild);
+  }
+  if (targetview === 'favorites') {
+    for (var i = 0; i < data.favorites.length; i++) {
+      $imagegrid.appendChild(createImageCell(data.favorites[i].imageURL, data.favorites[i].ID, data.favorites[i].favorited));
+    }
+  } else {
+    getRandomImages(20);
+  }
 }
