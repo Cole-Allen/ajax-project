@@ -6,7 +6,6 @@ body {
 
 header {
   background: #00ab7d;
-  padding: 20px;
 }
 
 i {
@@ -25,11 +24,19 @@ a {
   padding-bottom: 9px;
 }
 
+.header-favorites {
+  padding: 10px 20px;
+}
+
+.favorites-view {
+  color: #00ab7d;
+  background: white;
+  border-radius: 20px;
+}
+
 .cell {
-  flex-basis: 25%;
-  max-width: 315px;
-  aspect-ratio: 1/1;
   padding: 10px;
+  min-width: 100%;
 }
 
 .image-box {
@@ -97,16 +104,4 @@ a {
   margin-top: 40px;
   font-size: 4rem;
   justify-content: space-between;
-}
-
-@media screen and (max-width: 768px) {
-  .image-cell {
-    flex-basis: 50%;
-  }
-}
-
-@media screen and (max-width: 480px) {
-  .image-cell {
-    flex-basis: 100%;
-  }
 }
