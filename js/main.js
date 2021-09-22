@@ -1,13 +1,11 @@
 var catImages = {
-  entries: []
+  entries: [],
+  cells: []
 };
-
-var column = 0;
 
 var $headerLogo = document.querySelector('.header-logo');
 var $headerFavorites = document.querySelector('.header-favorites');
 
-var $imagegrid = document.querySelector('.grid');
 var $imageColumns = document.querySelectorAll('.column');
 var $modal = document.querySelector('.modal');
 
@@ -29,6 +27,7 @@ function getRandomImages(amount) {
     catPhotos.send();
 
   }
+  assignCellstoColumn(catImages.entries);
 }
 
 function loadCatPhotos() {
@@ -42,32 +41,35 @@ function loadCatPhotos() {
   cellData.cell = cell; // The cell that shows up on the grid.Needed to get the heart on the grid view
 
   catImages.entries.push(cellData); // Shows current random entries. Length should not be larger than the amount parameter of the getRandomIMages function
-
+  catImages.cells.push(cell);
   data.nextID++; // Makes sure no cells share the same id
 
   // $imagegrid.appendChild(cell); // Adds the Cell to the grid view
+  assignCellstoColumn(catImages.cells);
+}
 
-  switch (column) {
-    case 0:
-      $imageColumns[0].appendChild(cell);
-      console.log('1');
-      column++;
-      break;
-    case 1:
-      $imageColumns[1].appendChild(cell);
-      console.log('2');
-      column++;
-      break;
-    case 2:
-      $imageColumns[2].appendChild(cell);
-      console.log('3');
-      column++;
-      break;
-    case 3:
-      $imageColumns[3].appendChild(cell);
-      console.log('4');
-      column = 0;
-      break;
+function assignCellstoColumn(cellArray) {
+  var column = 0;
+  for (var i = 0; i < cellArray.length; i++) {
+    var cell = cellArray[i];
+    switch (column) {
+      case 0:
+        $imageColumns[0].appendChild(cell);
+        column++;
+        break;
+      case 1:
+        $imageColumns[1].appendChild(cell);
+        column++;
+        break;
+      case 2:
+        $imageColumns[2].appendChild(cell);
+        column++;
+        break;
+      case 3:
+        $imageColumns[3].appendChild(cell);
+        column = 0;
+        break;
+    }
   }
 
 }
@@ -182,14 +184,29 @@ function modalHandler(targetCell) {
 }
 
 function switchViews(targetview) {
-  while ($imagegrid.firstChild) {
-    $imagegrid.removeChild($imagegrid.firstChild);
+  while ($imageColumns[0].firstChild) {
+    $imageColumns[0].removeChild($imageColumns[0].firstChild);
+  }
+  while ($imageColumns[1].firstChild) {
+    $imageColumns[1].removeChild($imageColumns[1].firstChild);
+  }
+  while ($imageColumns[2].firstChild) {
+    $imageColumns[2].removeChild($imageColumns[2].firstChild);
+  }
+  while ($imageColumns[3].firstChild) {
+    $imageColumns[3].removeChild($imageColumns[3].firstChild);
   }
   if (targetview === 'favorites') {
+    var favoriteCells = [];
     for (var i = 0; i < data.favorites.length; i++) {
-      $imagegrid.appendChild(createImageCell(data.favorites[i].imageURL, data.favorites[i].ID, data.favorites[i].favorited));
+      favoriteCells.push(createImageCell(data.favorites[i].imageURL, data.favorites[i].ID, data.favorites[i].favorited));
     }
+    assignCellstoColumn(favoriteCells);
   } else {
+    catImages = {
+      entries: [],
+      cells: []
+    };
     getRandomImages(20);
   }
 }
