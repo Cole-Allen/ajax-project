@@ -19,4 +19,9 @@
   margin: 20px 10px;
   display: flex;
   flex-wrap: wrap;
+  justify-content: center;
+}
+
+.hidden {
+  display: none !important;
 }

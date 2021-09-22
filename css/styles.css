@@ -25,8 +25,9 @@ a {
   padding-bottom: 9px;
 }
 
-.image-cell {
+.cell {
   flex-basis: 25%;
+  max-width: 315px;
   aspect-ratio: 1/1;
   padding: 10px;
 }
@@ -38,8 +39,24 @@ a {
   overflow: hidden;
 }
 
+.image-box img {
+  transition: transform 1s;
+  transform: scale(1);
+}
+
+.image-box img:hover {
+  transform: scale(1.2);
+}
+
+.cell-image {
+  display: block;
+  object-fit: cover;
+  object-position: center;
+  height: 100%;
+}
+
 .image-overlay {
-  cursor: pointer;
+  pointer-events: none;
   display: flex;
   justify-content: right;
   align-items: end;
@@ -51,6 +68,35 @@ a {
   background: linear-gradient(0deg, rgba(0, 0, 0, 0.582), rgba(0, 0, 0, 0));
   font-size: 2rem;
   padding: 20px 10px;
+}
+
+.image-overlay a {
+  pointer-events: initial;
+}
+
+.modal {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  left: 0;
+  display: flex;
+  flex-wrap: wrap;
+  background: rgba(0, 0, 0, 0.856);
+  justify-content: center;
+  align-items: center;
+  padding: 50px;
+  overflow: scroll;
+}
+
+.modal-image {
+  max-width: 1500px;
+}
+
+.modal-icons {
+  margin-top: 40px;
+  font-size: 4rem;
+  justify-content: space-between;
 }
 
 @media screen and (max-width: 768px) {
