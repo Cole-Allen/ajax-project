@@ -15,7 +15,6 @@ function loadCatPhotos() {
 
   data.entries.push(cellData);
   data.entries[data.nextID].cell.addEventListener('click', cellEventListener);
-  data.entries[data.nextID].imageNode.addEventListener('click', whenImageClicked);
   data.nextID++;
 
   $imagegrid.appendChild(cellData.cell);
@@ -25,7 +24,7 @@ function loadCatPhotos() {
 function createImageCell(imageURL, id) {
   var cellData = {};
   cellData.imageURL = imageURL;
-  var $imageCell = document.createElement('div');
+  var $cell = document.createElement('div');
   var $imageBox = document.createElement('div');
   var $imageOverlay = document.createElement('div');
   var $imgA = document.createElement('a');
@@ -35,17 +34,18 @@ function createImageCell(imageURL, id) {
   var $pen = document.createElement('i');
   var $heart = document.createElement('i');
 
-  $imageCell.setAttribute('class', 'image-cell');
-  $imageCell.setAttribute('cell-id', id);
+  $cell.setAttribute('class', 'cell');
+  $cell.setAttribute('cell-id', id);
   $imageBox.setAttribute('class', 'image-box');
   $imageOverlay.setAttribute('class', 'image-overlay');
   $image.setAttribute('src', imageURL);
+  $image.setAttribute('image-id', id);
   $pen.setAttribute('icon', 'edit');
   $heart.setAttribute('icon', 'heart');
   $pen.setAttribute('class', 'fas fa-pen');
   $heart.setAttribute('class', 'far fa-heart');
 
-  $imageCell.appendChild($imageBox);
+  $cell.appendChild($imageBox);
   $imageBox.appendChild($imgA);
   $imageBox.appendChild($imageOverlay);
   $imgA.appendChild($image);
@@ -54,16 +54,15 @@ function createImageCell(imageURL, id) {
   $penA.appendChild($pen);
   $heartA.appendChild($heart);
   cellData.ID = id;
-  cellData.cell = $imageCell;
+  cellData.cell = $cell;
   cellData.favorite = false;
-  cellData.imageNode = $image;
 
   return cellData;
 
 }
 
 function cellEventListener(event) {
-  console.log(event.target);
+  console.log(event.currentTarget);
 
   // Handle favorites in 'cell' view
   if (event.target.getAttribute('icon') === 'heart') {
@@ -78,17 +77,24 @@ function cellEventListener(event) {
         event.target.classList.add('far');
       }
     }
+  } else if (event.target.getAttribute('image-id')) {
+    for (var j = 0; j < data.entries.length; j++) {
+      if (event.currentTarget.getAttribute('cell-id') === data.entries[j].ID.toString()) {
+        whenImageClicked(event.target.getAttribute('src'), data.entries[j]);
+      }
+    }
+
   }
 }
 
-function whenImageClicked(event) {
+function whenImageClicked(url, targetCell) {
   $modal.classList.remove('hidden');
-  $modal.querySelector('img').setAttribute('src', event.target.getAttribute('src'));
-  modalHandler();
+  $modal.querySelector('img').setAttribute('src', url);
+  modalHandler(targetCell);
 
 }
 
-function modalHandler() {
+function modalHandler(targetCell) {
   var $heart = $modal.querySelector('.fa-heart');
   $modal.addEventListener('click', function (event) {
     if (event.target === $modal.querySelector('.fa-times-circle')) {
@@ -99,6 +105,7 @@ function modalHandler() {
       $heart.classList.remove('far');
       $heart.classList.add('fas');
     } else if (event.target === $heart && data.favorites.includes(targetCell)) {
+      data.favorites.splice(data.favorites.indexOf(targetCell), 1);
       $heart.classList.add('far');
       $heart.classList.remove('fas');
     }

@@ -25,7 +25,7 @@ a {
   padding-bottom: 9px;
 }
 
-.image-cell {
+.cell {
   flex-basis: 25%;
   max-width: 315px;
   aspect-ratio: 1/1;
