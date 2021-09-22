@@ -6,7 +6,6 @@ body {
 
 header {
   background: #00ab7d;
-  padding: 20px;
 }
 
 i {
@@ -25,8 +24,19 @@ a {
   padding-bottom: 9px;
 }
 
+.header-favorites {
+  padding: 10px 20px;
+}
+
+.favorites-view {
+  color: #00ab7d;
+  background: white;
+  border-radius: 20px;
+}
+
 .cell {
   padding: 10px;
+  min-width: 100%;
 }
 
 .image-box {

@@ -12,10 +12,12 @@ var $modal = document.querySelector('.modal');
 getRandomImages(20); // Populates the page with 20 random images from the API
 
 $headerFavorites.addEventListener('click', function (event) {
+  $headerFavorites.classList.add('favorites-view');
   switchViews('favorites');
 });
 
 $headerLogo.addEventListener('click', function (event) {
+  $headerFavorites.classList.remove('favorites-view');
   switchViews('buit');
 });
 
@@ -37,7 +39,14 @@ function loadCatPhotos() {
   var cellData = {};
   cellData.ID = data.nextID; // The Cell ID
   cellData.imageURL = translatedJSON.file; // The Image URL
-  cellData.favorited = false; // Lets the page know if the hearts should already be filled in
+  for (var i = 0; i < data.favorites.length; i++) {
+    if (cellData.imageURL === data.favorites[i].imageURL) {
+      cellData.favorited = true;
+    } else {
+      cellData.favorited = false;
+    }
+  }
+  // cellData.favorited = false; // Lets the page know if the hearts should already be filled in
   cellData.cell = cell; // The cell that shows up on the grid.Needed to get the heart on the grid view
 
   catImages.entries.push(cellData); // Shows current random entries. Length should not be larger than the amount parameter of the getRandomIMages function
