@@ -1,6 +1,11 @@
 /* exported data */
+/* exported catImages */
+
+var catImages = {
+  entries: []
+};
+
 var data = {
-  entries: [],
   favorites: [],
   nextID: 0,
   view: null
@@ -16,5 +21,4 @@ var previousData = localStorage.getItem('cat-data');
 
 if (previousData) {
   data = JSON.parse(previousData);
-  data.entries = [];
 }

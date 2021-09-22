@@ -1,3 +1,5 @@
+/* imported catImages */
+
 var $headerLogo = document.querySelector('.header-logo');
 var $headerFavorites = document.querySelector('.header-favorites');
 
@@ -33,7 +35,7 @@ function loadCatPhotos() {
   cellData.favorited = false; // Lets the page know if the hearts should already be filled in
   cellData.cell = cell; // The cell that shows up on the grid.Needed to get the heart on the grid view
 
-  data.entries.push(cellData); // Shows current random entries. Length should not be larger than the amount parameter of the getRandomIMages function
+  catImages.entries.push(cellData); // Shows current random entries. Length should not be larger than the amount parameter of the getRandomIMages function
 
   data.nextID++; // Makes sure no cells share the same id
 
@@ -91,23 +93,23 @@ function cellEventListener(event) { //! !!!!! Need to fix so that it works witho
   console.log(event.target);
   // Handle favorites in 'cell' view
   if (event.target.getAttribute('icon') === 'heart') {
-    for (var i = 0; i < data.entries.length; i++) {
-      if (data.entries[i].ID.toString() === event.currentTarget.getAttribute('cell-id') && !data.favorites.includes(data.entries[i])) {
-        data.favorites.push(data.entries[i]);
-        data.entries[i].favorited = true;
+    for (var i = 0; i < catImages.entries.length; i++) {
+      if (catImages.entries[i].ID.toString() === event.currentTarget.getAttribute('cell-id') && !data.favorites.includes(catImages.entries[i])) {
+        data.favorites.push(catImages.entries[i]);
+        catImages.entries[i].favorited = true;
         event.target.classList.remove('far');
         event.target.classList.add('fas');
-      } else if (data.entries[i].ID.toString() === event.currentTarget.getAttribute('cell-id') && data.favorites.includes(data.entries[i])) {
-        data.favorites.splice(data.favorites.indexOf(data.entries[i]), 1);
-        data.entries[i].favorited = false;
+      } else if (catImages.entries[i].ID.toString() === event.currentTarget.getAttribute('cell-id') && data.favorites.includes(catImages.entries[i])) {
+        data.favorites.splice(data.favorites.indexOf(catImages.entries[i]), 1);
+        catImages.entries[i].favorited = false;
         event.target.classList.remove('fas');
         event.target.classList.add('far');
       }
     }
   } else if (event.target.getAttribute('image-id')) {
-    for (var j = 0; j < data.entries.length; j++) {
-      if (event.currentTarget.getAttribute('cell-id') === data.entries[j].ID.toString()) {
-        whenImageClicked(event.target.getAttribute('src'), data.entries[j]);
+    for (var j = 0; j < catImages.entries.length; j++) {
+      if (event.currentTarget.getAttribute('cell-id') === catImages.entries[j].ID.toString()) {
+        whenImageClicked(event.target.getAttribute('src'), catImages.entries[j]);
       }
     }
 
