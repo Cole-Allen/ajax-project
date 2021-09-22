@@ -1,6 +1,7 @@
 var catImages = {
   entries: [],
-  cells: []
+  cells: [],
+  unfaved: []
 };
 
 var $headerLogo = document.querySelector('.header-logo');
@@ -10,15 +11,18 @@ var $imageColumns = document.querySelectorAll('.column');
 var $modal = document.querySelector('.modal');
 
 getRandomImages(20); // Populates the page with 20 random images from the API
+data.view = 'grid';
 
 $headerFavorites.addEventListener('click', function (event) {
   $headerFavorites.classList.add('favorites-view');
+  data.view = 'favorites';
   switchViews('favorites');
 });
 
 $headerLogo.addEventListener('click', function (event) {
   $headerFavorites.classList.remove('favorites-view');
   switchViews('buit');
+  data.view = 'grid';
 });
 
 function getRandomImages(amount) {
@@ -41,7 +45,6 @@ function loadCatPhotos() {
   cellData.imageURL = translatedJSON.file; // The Image URL
   for (var i = 0; i < data.favorites.length; i++) {
     if (cellData.imageURL === data.favorites[i].imageURL) {
-      console.log('favorited');
       cellData.favorited = true;
       break;
     } else {
@@ -132,30 +135,20 @@ function createImageCell(imageURL, id, favorited) {
 }
 
 function cellEventListener(event) {
-  // Handle favorites in 'cell' view
-  if (event.target.getAttribute('icon') === 'heart') {
-    for (var i = 0; i < catImages.entries.length; i++) {
-      if (catImages.entries[i].ID.toString() === event.currentTarget.getAttribute('cell-id') && !data.favorites.includes(catImages.entries[i])) {
-        data.favorites.push(catImages.entries[i]);
-        catImages.entries[i].favorited = true;
-        event.target.classList.remove('far');
-        event.target.classList.add('fas');
-        event.target.classList.add('faved');
-      } else if (catImages.entries[i].ID.toString() === event.currentTarget.getAttribute('cell-id') && data.favorites.includes(catImages.entries[i])) {
-        data.favorites.splice(data.favorites.indexOf(catImages.entries[i]), 1);
-        catImages.entries[i].favorited = false;
-        event.target.classList.remove('fas');
-        event.target.classList.remove('faved');
-        event.target.classList.add('far');
-      }
-    }
-  } else if (event.target.getAttribute('image-id')) {
-    for (var j = 0; j < catImages.entries.length; j++) {
-      if (event.currentTarget.getAttribute('cell-id') === catImages.entries[j].ID.toString()) {
-        whenImageClicked(event.target.getAttribute('src'), catImages.entries[j]);
-      }
-    }
-
+  if (event.target.getAttribute('icon') === 'heart' && !data.favorites.includes(event.currentTarget)) {
+    data.favorites.push(event.currentTarget);
+    event.currentTarget.favorited = true;
+    event.target.classList.remove('far');
+    event.target.classList.add('fas');
+    event.target.classList.add('faved');
+  } else if (event.target.getAttribute('icon') === 'heart') {
+    event.currentTarget.favorited = false;
+    data.favorites.splice(data.favorites.indexOf(event.currentTarget));
+    event.target.classList.remove('fas');
+    event.target.classList.add('far');
+    event.target.classList.remove('faved');
+  } else if (event.target.getAttribute('src')) {
+    whenImageClicked(event.target.getAttribute('src'), event.currentTarget);//
   }
 }
 
@@ -168,7 +161,7 @@ function whenImageClicked(url, targetCell) {
 
 function modalHandler(targetCell) {
   var $heart = $modal.querySelector('.fa-heart');
-  var $cellHeart = targetCell.cell.querySelector('.fa-heart'); // Links the heart effect to the grid view cell
+  var $cellHeart = targetCell.querySelector('.fa-heart'); // Links the heart effect to the grid view cell
   if (data.favorites.includes(targetCell)) {
     $heart.classList.remove('far');
     $heart.classList.add('fas');
@@ -194,6 +187,9 @@ function modalHandler(targetCell) {
     } else if (event.target === $heart && data.favorites.includes(targetCell)) {
       event.target.favorited = false;
       data.favorites.splice(data.favorites.indexOf(targetCell), 1);
+      $cellHeart.classList.add('far');
+      $cellHeart.classList.remove('fas');
+      $cellHeart.classList.remove('faved');
       $heart.classList.add('far');
       $heart.classList.remove('fas');
       $heart.classList.remove('faved');
