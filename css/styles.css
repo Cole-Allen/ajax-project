@@ -45,24 +45,6 @@ a {
   overflow: hidden;
 }
 
-.image-box img {
-  width: 100%;
-
-  /* transition: transform 1s;
-  transform: scale(1); */
-}
-
-/* .image-box img:hover {
-  transform: scale(1.2);
-} */
-
-.cell-image {
-  display: block;
-  object-fit: cover;
-  object-position: center;
-  height: 100%;
-}
-
 .image-overlay {
   pointer-events: none;
   display: flex;
