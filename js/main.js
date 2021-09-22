@@ -46,7 +46,6 @@ function loadCatPhotos() {
       cellData.favorited = false;
     }
   }
-  // cellData.favorited = false; // Lets the page know if the hearts should already be filled in
   cellData.cell = cell; // The cell that shows up on the grid.Needed to get the heart on the grid view
 
   catImages.entries.push(cellData); // Shows current random entries. Length should not be larger than the amount parameter of the getRandomIMages function
@@ -193,17 +192,10 @@ function modalHandler(targetCell) {
 }
 
 function switchViews(targetview) {
-  while ($imageColumns[0].firstChild) {
-    $imageColumns[0].removeChild($imageColumns[0].firstChild);
-  }
-  while ($imageColumns[1].firstChild) {
-    $imageColumns[1].removeChild($imageColumns[1].firstChild);
-  }
-  while ($imageColumns[2].firstChild) {
-    $imageColumns[2].removeChild($imageColumns[2].firstChild);
-  }
-  while ($imageColumns[3].firstChild) {
-    $imageColumns[3].removeChild($imageColumns[3].firstChild);
+  for (var d = 0; d < $imageColumns.length; d++) {
+    while ($imageColumns[d].firstChild) {
+      $imageColumns[d].removeChild($imageColumns[d].firstChild);
+    }
   }
   if (targetview === 'favorites') {
     var favoriteCells = [];
