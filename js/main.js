@@ -4,13 +4,15 @@ var catImages = {
   unfaved: []
 };
 
+var randAmount = 20;
+
 var $headerLogo = document.querySelector('.header-logo');
 var $headerFavorites = document.querySelector('.header-favorites');
 
 var $imageColumns = document.querySelectorAll('.column');
 var $modal = document.querySelector('.modal');
 
-getRandomImages(20); // Populates the page with 20 random images from the API
+getRandomImages(randAmount); // Populates the page with 20 random images from the API
 data.view = 'grid';
 
 $headerFavorites.addEventListener('click', function (event) {
@@ -236,6 +238,6 @@ function switchViews(targetview) {
       entries: [],
       cells: []
     };
-    getRandomImages(20);
+    getRandomImages(randAmount);
   }
 }
