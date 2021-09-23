@@ -152,9 +152,8 @@ function cellEventListener(event) {
 function favoriteHandler(event) {
   for (var i = 0; i < catImages.entries.length; i++) {
     if (event.currentTarget.getAttribute('cell-id') === catImages.entries[i].ID.toString()) {
-
+      catImages.entries[i].favorited = true;
       data.favorites.push(catImages.entries[i]);
-      event.currentTarget.favorited = true;
       event.target.classList.remove('far');
       event.target.classList.add('fas');
       event.target.classList.add('faved');
