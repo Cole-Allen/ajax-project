@@ -6,10 +6,12 @@ var catImages = {
 
 var randAmount = 20;
 
+var $views = document.querySelectorAll('.view');
+
 var $headerLogo = document.querySelector('.header-logo');
 var $headerFavorites = document.querySelector('.header-favorites');
 
-var $imageColumns = document.querySelectorAll('.column');
+var $imageColumns = document.querySelectorAll('.main-view .column');
 var $modal = document.querySelector('.modal');
 
 switchViews(data.view);
@@ -20,8 +22,8 @@ $headerFavorites.addEventListener('click', function (event) {
 });
 
 $headerLogo.addEventListener('click', function (event) {
-  switchViews('buit');
-  data.view = 'grid';
+  switchViews('main-view');
+  data.view = 'main-view';
 });
 
 function getRandomImages(amount) {
@@ -224,11 +226,18 @@ function switchViews(targetview) {
       $imageColumns[d].removeChild($imageColumns[d].firstChild);
     }
   }
+
+  for (var i = 0; i < $views.length; i++) {
+    $views[i].classList.add('hidden');
+    if ($views[i].getAttribute('data-view') === targetview) {
+      $views[i].classList.remove('hidden');
+    }
+  }
   if (targetview === 'favorites') {
     $headerFavorites.classList.add('favorites-view');
     var favoriteCells = [];
-    for (var i = 0; i < data.favorites.length; i++) {
-      favoriteCells.push(createImageCell(data.favorites[i].imageURL, data.favorites[i].ID, data.favorites[i].favorited));
+    for (var j = 0; j < data.favorites.length; j++) {
+      favoriteCells.push(createImageCell(data.favorites[j].imageURL, data.favorites[j].ID, data.favorites[j].favorited));
     }
     assignCellstoColumn(favoriteCells);
   } else {
@@ -254,8 +263,6 @@ calculateFontSize($memeBottomText, $memeBottomText.textContent.length);
 window.addEventListener('resize', function (event) {
   calculateFontSize($memeTopText, $memeTopText.textContent.length);
   calculateFontSize($memeBottomText, $memeBottomText.textContent.length);
-  console.log($memeImageSize.clientWidth);
-
 });
 
 $memeTopInput.addEventListener('input', function (event) {
@@ -271,6 +278,6 @@ $memeBottomInput.addEventListener('input', function (event) {
 
 function calculateFontSize(textNode, textLength) {
   if (textLength <= 12) {
-    textNode.style.fontSize = 'min(calc(' + $memeImageSize.clientWidth + 'px / ' + textLength + ' * 1.2), 10rem)';
+    textNode.style.fontSize = 'min(calc(' + $memeImageSize.clientWidth + 'px / ' + textLength + ' * 1.2), 8rem)'; // Will need to change the max so that it will work on VERY large monitors
   }
 }
