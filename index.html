@@ -14,6 +14,7 @@
   <link rel="stylesheet" href="css/reset.css">
   <link rel="stylesheet" href="css/layout.css">
   <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/meme.css">
 </head>
 <body>
   <header>
@@ -28,7 +29,7 @@
   </header>
 
   <main>
-    <div class="container grid" data-view="cell-grid">
+    <div class="container grid hidden" data-view="cell-grid">
       <div class="column">
 
       </div>
@@ -42,9 +43,23 @@
 
       </div>
     </div>
-    <div class="meme-view container hidden" data-view="meme-view">
-      <h1>Meme Maker</h1>
-      <img src="images/placeholder.jpg">
+    <div class="meme-view container" data-view="meme-view">
+      <h1 class="meme-title">Meme Maker</h1>
+      <img class="meme-image" src="images/placeholder.jpg">
+        <form method="GET" class="meme-form">
+          <div class="meme-inputs">
+            <label for="top-text">
+              Top Text
+            </label>
+            <input type="text" id="top-text" name="top-text" required>
+            <label for="bottom-text">
+              Bottom Text
+            </label>
+            <input type="text" id="bottom-text" name="bottom-text" required>
+          </div>
+
+          <button type="button">Save</button>
+        </form>
     </div>
     <div class="modal hidden">
       <div class="modal-items">
