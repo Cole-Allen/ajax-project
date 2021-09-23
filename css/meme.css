@@ -67,13 +67,12 @@
   left: 0;
   font-family: 'Poppins-Bold', 'Poppins', sans-serif;
   font-weight: 700;
-  font-size: 100%;
   overflow-wrap: break-word;
   overflow: hidden;
 }
 
-.meme-text text {
-  fill: white;
-  stroke: black;
-  stroke-width: 0.1%;
+.meme-text h1 {
+  font-size: 80px;
+  text-size-adjust: 100%;
+  text-rendering: geometricPrecision;
 }

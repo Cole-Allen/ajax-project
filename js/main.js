@@ -241,17 +241,28 @@ function switchViews(targetview) {
   }
 }
 
+var $memeImageSize = document.querySelector('.meme-image');
+console.log($memeImageSize.clientWidth);
+
 var $memeTopText = document.querySelector('.top-text');
 var $memeBottomText = document.querySelector('.bottom-text');
 
 var $memeTopInput = document.getElementById('top-text');
 var $memeBottomInput = document.getElementById('bottom-text');
 
+window.addEventListener('resize', function (event) {
+  $memeTopText.style.fontSize = 'calc(' + $memeImageSize.clientWidth + 'px / ' + $memeTopInput.value.length + ' * 1.2)';
+  $memeBottomText.style.fontSize = 'calc(' + $memeImageSize.clientWidth + 'px / ' + $memeBottomInput.value.length + ' * 1.2)';
+
+});
+
 $memeTopInput.addEventListener('input', function (event) {
   $memeTopText.textContent = $memeTopInput.value;
+  $memeTopText.style.fontSize = 'calc(' + $memeImageSize.clientWidth + 'px / ' + $memeTopInput.value.length + ' * 1.2)';
 
 });
 
 $memeBottomInput.addEventListener('input', function (event) {
   $memeBottomText.textContent = $memeBottomInput.value;
+  $memeBottomText.style.fontSize = 'calc(' + $memeImageSize.clientWidth + 'px / ' + $memeBottomInput.value.length + ' * 1.2)';
 });
