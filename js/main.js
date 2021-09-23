@@ -12,17 +12,14 @@ var $headerFavorites = document.querySelector('.header-favorites');
 var $imageColumns = document.querySelectorAll('.column');
 var $modal = document.querySelector('.modal');
 
-getRandomImages(randAmount); // Populates the page with 20 random images from the API
-data.view = 'grid';
+switchViews(data.view);
 
 $headerFavorites.addEventListener('click', function (event) {
-  $headerFavorites.classList.add('favorites-view');
   data.view = 'favorites';
   switchViews('favorites');
 });
 
 $headerLogo.addEventListener('click', function (event) {
-  $headerFavorites.classList.remove('favorites-view');
   switchViews('buit');
   data.view = 'grid';
 });
@@ -228,12 +225,14 @@ function switchViews(targetview) {
     }
   }
   if (targetview === 'favorites') {
+    $headerFavorites.classList.add('favorites-view');
     var favoriteCells = [];
     for (var i = 0; i < data.favorites.length; i++) {
       favoriteCells.push(createImageCell(data.favorites[i].imageURL, data.favorites[i].ID, data.favorites[i].favorited));
     }
     assignCellstoColumn(favoriteCells);
   } else {
+    $headerFavorites.classList.remove('favorites-view');
     catImages = {
       entries: [],
       cells: []
