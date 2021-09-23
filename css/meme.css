@@ -48,6 +48,7 @@
 .meme-form button {
   color: white;
   font-size: 2rem;
+  font-weight: 900;
   border: none;
   background: #00ab7d;
   border-radius: 10px;
@@ -72,7 +73,28 @@
 }
 
 .meme-text h1 {
+  text-align: center;
+  max-width: 100%;
   font-size: 80px;
   text-size-adjust: 100%;
   text-rendering: geometricPrecision;
+  filter:
+    drop-shadow(0 0 1px black)
+    drop-shadow(0 0 1px black)
+    drop-shadow(0 0 1px black)
+    drop-shadow(0 0 1px black)
+    drop-shadow(0 0 1px black)
+    drop-shadow(0 0 1px black)
+    drop-shadow(0 0 1px black);
+}
+
+@media screen and (max-width: 900px) {
+  .meme-image,
+  .meme-form {
+    flex-basis: 100%;
+  }
+
+  .meme-form {
+    margin-top: 20px;
+  }
 }

@@ -242,27 +242,35 @@ function switchViews(targetview) {
 }
 
 var $memeImageSize = document.querySelector('.meme-image');
-console.log($memeImageSize.clientWidth);
 
 var $memeTopText = document.querySelector('.top-text');
 var $memeBottomText = document.querySelector('.bottom-text');
 
 var $memeTopInput = document.getElementById('top-text');
 var $memeBottomInput = document.getElementById('bottom-text');
+calculateFontSize($memeTopText, $memeTopText.textContent.length);
+calculateFontSize($memeBottomText, $memeBottomText.textContent.length);
 
 window.addEventListener('resize', function (event) {
-  $memeTopText.style.fontSize = 'calc(' + $memeImageSize.clientWidth + 'px / ' + $memeTopInput.value.length + ' * 1.2)';
-  $memeBottomText.style.fontSize = 'calc(' + $memeImageSize.clientWidth + 'px / ' + $memeBottomInput.value.length + ' * 1.2)';
+  calculateFontSize($memeTopText, $memeTopText.textContent.length);
+  calculateFontSize($memeBottomText, $memeBottomText.textContent.length);
+  console.log($memeImageSize.clientWidth);
 
 });
 
 $memeTopInput.addEventListener('input', function (event) {
   $memeTopText.textContent = $memeTopInput.value;
-  $memeTopText.style.fontSize = 'calc(' + $memeImageSize.clientWidth + 'px / ' + $memeTopInput.value.length + ' * 1.2)';
+  calculateFontSize($memeTopText, $memeTopText.textContent.length);
 
 });
 
 $memeBottomInput.addEventListener('input', function (event) {
   $memeBottomText.textContent = $memeBottomInput.value;
-  $memeBottomText.style.fontSize = 'calc(' + $memeImageSize.clientWidth + 'px / ' + $memeBottomInput.value.length + ' * 1.2)';
+  calculateFontSize($memeBottomText, $memeBottomText.textContent.length);
 });
+
+function calculateFontSize(textNode, textLength) {
+  if (textLength <= 12) {
+    textNode.style.fontSize = 'min(calc(' + $memeImageSize.clientWidth + 'px / ' + textLength + ' * 1.2), 10rem)';
+  }
+}
