@@ -135,20 +135,43 @@ function createImageCell(imageURL, id, favorited) {
 }
 
 function cellEventListener(event) {
-  if (event.target.getAttribute('icon') === 'heart' && !data.favorites.includes(event.currentTarget)) {
-    data.favorites.push(event.currentTarget);
-    event.currentTarget.favorited = true;
-    event.target.classList.remove('far');
-    event.target.classList.add('fas');
-    event.target.classList.add('faved');
-  } else if (event.target.getAttribute('icon') === 'heart') {
-    event.currentTarget.favorited = false;
-    data.favorites.splice(data.favorites.indexOf(event.currentTarget));
-    event.target.classList.remove('fas');
-    event.target.classList.add('far');
-    event.target.classList.remove('faved');
+
+  if (event.target.getAttribute('icon') === 'heart') {
+    for (var i = 0; i < data.favorites.length; i++) {
+      if (data.favorites[i].ID.toString() === event.currentTarget.getAttribute('cell-id')) {
+        unfavoriteHandler(event);
+        return;
+      }
+    }
+    favoriteHandler(event);
   } else if (event.target.getAttribute('src')) {
-    whenImageClicked(event.target.getAttribute('src'), event.currentTarget);//
+    whenImageClicked(event.target.getAttribute('src'), event.currentTarget);
+  }
+}
+
+function favoriteHandler(event) {
+  for (var i = 0; i < catImages.entries.length; i++) {
+    if (event.currentTarget.getAttribute('cell-id') === catImages.entries[i].ID.toString()) {
+
+      data.favorites.push(catImages.entries[i]);
+      event.currentTarget.favorited = true;
+      event.target.classList.remove('far');
+      event.target.classList.add('fas');
+      event.target.classList.add('faved');
+    }
+  }
+}
+
+function unfavoriteHandler(event) {
+
+  for (var i = 0; i < data.favorites.length; i++) {
+    if (event.currentTarget.getAttribute('cell-id') === data.favorites[i].ID.toString()) {
+      data.favorites[i].favorited = false;
+      data.favorites.splice(data.favorites.indexOf(data.favorites[i]), 1);
+      event.target.classList.remove('fas');
+      event.target.classList.add('far');
+      event.target.classList.remove('faved');
+    }
   }
 }
 
