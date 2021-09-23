@@ -45,17 +45,29 @@
     </div>
     <div class="meme-view container" data-view="meme-view">
       <h1 class="meme-title">Meme Maker</h1>
-      <img class="meme-image" src="images/placeholder.jpg">
+      <div class="meme-image">
+        <div class="meme-text">
+          <svg viewbox="0 0 56 18">
+            <text class="top-text" x="0" y="15"></text>
+          </svg>
+          <svg viewbox="0 0 56 18">
+            <text class="bottom-text" x="0" y="15"></text>
+          </svg>
+        </div>
+
+        <img src="images/placeholder.jpg">
+      </div>
+
         <form method="GET" class="meme-form">
           <div class="meme-inputs">
             <label for="top-text">
               Top Text
             </label>
-            <input type="text" id="top-text" name="top-text" required>
+            <input type="text" id="top-text" name="top-text" value="Top text" required>
             <label for="bottom-text">
               Bottom Text
             </label>
-            <input type="text" id="bottom-text" name="bottom-text" required>
+            <input type="text" id="bottom-text" name="bottom-text" value="Bottom text" required>
           </div>
 
           <button type="button">Save</button>

@@ -240,3 +240,18 @@ function switchViews(targetview) {
     getRandomImages(randAmount);
   }
 }
+
+var $memeTopText = document.querySelector('.top-text');
+var $memeBottomText = document.querySelector('.bottom-text');
+
+var $memeTopInput = document.getElementById('top-text');
+var $memeBottomInput = document.getElementById('bottom-text');
+
+$memeTopInput.addEventListener('input', function (event) {
+  $memeTopText.textContent = $memeTopInput.value;
+
+});
+
+$memeBottomInput.addEventListener('input', function (event) {
+  $memeBottomText.textContent = $memeBottomInput.value;
+});
