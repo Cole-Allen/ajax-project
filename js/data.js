@@ -3,7 +3,7 @@
 var data = {
   favorites: [],
   nextID: 0,
-  view: null
+  view: 'main-view'
 };
 
 window.addEventListener('beforeunload', function (event) {

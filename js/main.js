@@ -12,6 +12,7 @@ var $headerLogo = document.querySelector('.header-logo');
 var $headerFavorites = document.querySelector('.header-favorites');
 
 var $imageColumns = document.querySelectorAll('.main-view .column');
+var $favImageColumns = document.querySelectorAll('.fav-view .column');
 var $modal = document.querySelector('.modal');
 
 switchViews(data.view);
@@ -34,7 +35,9 @@ function getRandomImages(amount) {
     catPhotos.send();
 
   }
-  assignCellstoColumn(catImages.entries);
+  if (data.view === 'main-view') {
+    assignCellstoColumn(catImages.entries, $imageColumns);
+  }
 }
 
 function loadCatPhotos() {
@@ -60,28 +63,28 @@ function loadCatPhotos() {
   data.nextID++; // Makes sure no cells share the same id
 
   // $imagegrid.appendChild(cell); // Adds the Cell to the grid view
-  assignCellstoColumn(catImages.cells);
+  assignCellstoColumn(catImages.cells, $imageColumns);
 }
 
-function assignCellstoColumn(cellArray) {
+function assignCellstoColumn(cellArray, columns) {
   var column = 0;
   for (var i = 0; i < cellArray.length; i++) {
     var cell = cellArray[i];
     switch (column) {
       case 0:
-        $imageColumns[0].appendChild(cell);
+        columns[0].appendChild(cell);
         column++;
         break;
       case 1:
-        $imageColumns[1].appendChild(cell);
+        columns[1].appendChild(cell);
         column++;
         break;
       case 2:
-        $imageColumns[2].appendChild(cell);
+        columns[2].appendChild(cell);
         column++;
         break;
       case 3:
-        $imageColumns[3].appendChild(cell);
+        columns[3].appendChild(cell);
         column = 0;
         break;
     }
@@ -183,39 +186,48 @@ function whenImageClicked(url, targetCell) {
 }
 
 function modalHandler(targetCell) {
+  var cellDataM = null;
   var $heart = $modal.querySelector('.fa-heart');
   var $cellHeart = targetCell.querySelector('.fa-heart'); // Links the heart effect to the grid view cell
-  if (data.favorites.includes(targetCell)) {
+  for (var p = 0; p < catImages.entries.length; p++) {
+    if (catImages.entries[p].ID.toString() === targetCell.getAttribute('cell-id')) {
+      cellDataM = catImages.entries[p];
+    }
+  }
+
+  if (cellDataM.favorited) {
     $heart.classList.remove('far');
     $heart.classList.add('fas');
     $heart.classList.add('faved');
   } else {
+    $heart.classList.add('far');
     $heart.classList.remove('fas');
     $heart.classList.remove('faved');
-    $heart.classList.add('far');
   }
+
   $modal.addEventListener('click', function (event) {
     if (event.target === $modal.querySelector('.fa-times-circle')) {
       $modal.classList.add('hidden');
-    }
-    if (event.target === $heart && !data.favorites.includes(targetCell)) {
-      data.favorites.push(targetCell);
-      event.target.favorited = true;
-      $cellHeart.classList.remove('far');
-      $cellHeart.classList.add('fas');
-      $cellHeart.classList.add('faved');
-      $heart.classList.remove('far');
-      $heart.classList.add('fas');
-      $heart.classList.add('faved');
-    } else if (event.target === $heart && data.favorites.includes(targetCell)) {
-      event.target.favorited = false;
-      data.favorites.splice(data.favorites.indexOf(targetCell), 1);
-      $cellHeart.classList.add('far');
-      $cellHeart.classList.remove('fas');
-      $cellHeart.classList.remove('faved');
-      $heart.classList.add('far');
-      $heart.classList.remove('fas');
-      $heart.classList.remove('faved');
+    } else if (event.target === $heart) {
+      if (data.favorites.includes(cellDataM)) {
+        cellDataM.favorited = false;
+        data.favorites.splice(data.favorites.indexOf(cellDataM), 1);
+        $cellHeart.classList.add('far');
+        $cellHeart.classList.remove('fas');
+        $cellHeart.classList.remove('faved');
+        $heart.classList.add('far');
+        $heart.classList.remove('fas');
+        $heart.classList.remove('faved');
+      } else {
+        cellDataM.favorited = true;
+        data.favorites.push(cellDataM);
+        $cellHeart.classList.remove('far');
+        $cellHeart.classList.add('fas');
+        $cellHeart.classList.add('faved');
+        $heart.classList.remove('far');
+        $heart.classList.add('fas');
+        $heart.classList.add('faved');
+      }
     }
   });
 }
@@ -224,6 +236,12 @@ function switchViews(targetview) {
   for (var d = 0; d < $imageColumns.length; d++) {
     while ($imageColumns[d].firstChild) {
       $imageColumns[d].removeChild($imageColumns[d].firstChild);
+    }
+  }
+
+  for (var a = 0; a < $favImageColumns.length; a++) {
+    while ($favImageColumns[a].firstChild) {
+      $favImageColumns[a].removeChild($favImageColumns[a].firstChild);
     }
   }
 
@@ -239,7 +257,7 @@ function switchViews(targetview) {
     for (var j = 0; j < data.favorites.length; j++) {
       favoriteCells.push(createImageCell(data.favorites[j].imageURL, data.favorites[j].ID, data.favorites[j].favorited));
     }
-    assignCellstoColumn(favoriteCells);
+    assignCellstoColumn(favoriteCells, $favImageColumns);
   } else {
     $headerFavorites.classList.remove('favorites-view');
     catImages = {
