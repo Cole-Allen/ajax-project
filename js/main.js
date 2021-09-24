@@ -15,6 +15,20 @@ var $imageColumns = document.querySelectorAll('.main-view .column');
 var $favImageColumns = document.querySelectorAll('.fav-view .column');
 var $modal = document.querySelector('.modal');
 
+var $memeImageSize = document.querySelector('.meme-image');
+var $memeImage = document.querySelector('.meme-image img');
+
+var $memeTopText = document.querySelector('.top-text');
+var $memeBottomText = document.querySelector('.bottom-text');
+
+var $memeTopInput = document.getElementById('top-text');
+var $memeBottomInput = document.getElementById('bottom-text');
+
+var $canvas = document.querySelector('canvas');
+var $memeSaveButton = document.querySelector('.meme-form .download-meme');
+
+var ctx = $canvas.getContext('2d');
+
 switchViews(data.view);
 
 $headerFavorites.addEventListener('click', function (event) {
@@ -212,7 +226,7 @@ function modalHandler(targetCell) {
       $modal.classList.add('hidden');
       openPhotoInMemeView(targetCell.querySelector('.cell-image').getAttribute('src'));
     } else if (event.target === $modal.querySelector('.fa-download')) {
-      // add download system here
+      $modal.querySelector('.download-anchor').setAttribute('href', cellDataM.imageURL);
     } else if (event.target === $heart) {
       if (data.favorites.includes(cellDataM)) {
         cellDataM.favorited = false;
@@ -274,26 +288,16 @@ function switchViews(targetview) {
   }
 }
 
-var $memeImageSize = document.querySelector('.meme-image');
-var $memeImage = document.querySelector('.meme-image img');
-
 if (data.meme) {
   $memeImage.setAttribute('src', data.meme);
 }
 
-var $memeTopText = document.querySelector('.top-text');
-var $memeBottomText = document.querySelector('.bottom-text');
-
-var $memeTopInput = document.getElementById('top-text');
-var $memeBottomInput = document.getElementById('bottom-text');
 calculateFontSize($memeTopText, $memeTopText.textContent.length);
 calculateFontSize($memeBottomText, $memeBottomText.textContent.length);
 
 window.addEventListener('resize', function (event) {
   calculateFontSize($memeTopText, $memeTopText.textContent.length);
   calculateFontSize($memeBottomText, $memeBottomText.textContent.length);
-  $canvas.setAttribute('width', $memeImageSize.clientWidth);
-  $canvas.setAttribute('height', $memeImageSize.clientHeight);
   draw();
 });
 
@@ -307,6 +311,7 @@ $memeTopInput.addEventListener('input', function (event) {
 $memeBottomInput.addEventListener('input', function (event) {
   $memeBottomText.textContent = $memeBottomInput.value;
   calculateFontSize($memeBottomText, $memeBottomText.textContent.length);
+  draw();
 });
 
 function calculateFontSize(textNode, textLength) {
@@ -318,28 +323,38 @@ function calculateFontSize(textNode, textLength) {
 function openPhotoInMemeView(photoURL) {
   data.meme = photoURL;
   $memeImage.setAttribute('src', data.meme);
+  loadImage();
   switchViews('meme-view');
 }
 
-var $canvas = document.querySelector('canvas');
-$canvas.setAttribute('width', $memeImageSize.clientWidth);
-$canvas.setAttribute('height', $memeImageSize.clientHeight);
+function loadImage() {
+  var img = new Image();
+  img.src = data.meme;
+  img.addEventListener('load', draw);
+}
 
-var ctx = $canvas.getContext('2d');
-
-var img = new Image();
-img.src = data.meme;
-img.addEventListener('load', draw);
+loadImage();
 
 function draw() {
-  ctx.drawImage(img, 0, 0, $memeImageSize.clientWidth, $memeImageSize.clientHeight);
+
+  $canvas.setAttribute('width', $memeImage.width);
+  $canvas.setAttribute('height', $memeImage.height);
+  ctx.clearRect(0, 0, $canvas.width, $canvas.height);
+  // ctx.drawImage(img, 0, 0, $memeImageSize.clientWidth, $memeImageSize.clientHeight);
   ctx.lineWidth = 10;
   ctx.strokeStyle = 'black';
   ctx.font = '3rem sans-serif';
   ctx.textAlign = 'center';
   ctx.fillStyle = 'rgb(255, 255, 255)';
   ctx.miterLimit = 2;
-  ctx.strokeText($memeTopInput.value, $memeImageSize.clientWidth / 2, 50, $memeImageSize.clientWidth);
-  ctx.fillText($memeTopInput.value, $memeImageSize.clientWidth / 2, 50, $memeImageSize.clientWidth);
+  ctx.strokeText($memeTopInput.value, $memeImage.clientWidth / 2, 50, $memeImage.clientWidth);
+  ctx.fillText($memeTopInput.value, $memeImage.clientWidth / 2, 50, $memeImage.clientWidth);
+
+  ctx.strokeText($memeBottomInput.value, $memeImage.clientWidth / 2, $memeImage.clientHeight - 20, $memeImage.clientWidth);
+  ctx.fillText($memeBottomInput.value, $memeImage.clientWidth / 2, $memeImage.clientHeight - 20, $memeImage.clientWidth);
 
 }
+
+$memeSaveButton.addEventListener('click', function () {
+  $memeSaveButton.setAttribute('href', $canvas.toDataURL());
+});
