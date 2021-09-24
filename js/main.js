@@ -18,13 +18,11 @@ var $modal = document.querySelector('.modal');
 switchViews(data.view);
 
 $headerFavorites.addEventListener('click', function (event) {
-  data.view = 'favorites';
   switchViews('favorites');
 });
 
 $headerLogo.addEventListener('click', function (event) {
   switchViews('main-view');
-  data.view = 'main-view';
 });
 
 function getRandomImages(amount) {
@@ -148,6 +146,8 @@ function cellEventListener(event) {
       }
     }
     favoriteHandler(event);
+  } else if (event.target.getAttribute('icon') === 'edit') {
+    openPhotoInMemeView(event.currentTarget.querySelector('.cell-image').getAttribute('src'));
   } else if (event.target.getAttribute('src')) {
     whenImageClicked(event.target.getAttribute('src'), event.currentTarget);
   }
@@ -233,6 +233,7 @@ function modalHandler(targetCell) {
 }
 
 function switchViews(targetview) {
+  data.view = targetview;
   for (var d = 0; d < $imageColumns.length; d++) {
     while ($imageColumns[d].firstChild) {
       $imageColumns[d].removeChild($imageColumns[d].firstChild);
@@ -269,6 +270,7 @@ function switchViews(targetview) {
 }
 
 var $memeImageSize = document.querySelector('.meme-image');
+var $memeImage = document.querySelector('.meme-image img');
 
 var $memeTopText = document.querySelector('.top-text');
 var $memeBottomText = document.querySelector('.bottom-text');
@@ -298,4 +300,10 @@ function calculateFontSize(textNode, textLength) {
   if (textLength <= 12) {
     textNode.style.fontSize = 'min(calc(' + $memeImageSize.clientWidth + 'px / ' + textLength + ' * 1.2), 8rem)'; // Will need to change the max so that it will work on VERY large monitors
   }
+}
+
+function openPhotoInMemeView(photoURL) {
+  console.log(photoURL);
+  $memeImage.setAttribute('src', photoURL);
+  switchViews('meme-view');
 }
