@@ -292,6 +292,9 @@ calculateFontSize($memeBottomText, $memeBottomText.textContent.length);
 window.addEventListener('resize', function (event) {
   calculateFontSize($memeTopText, $memeTopText.textContent.length);
   calculateFontSize($memeBottomText, $memeBottomText.textContent.length);
+  $canvas.setAttribute('width', $memeImageSize.clientWidth);
+  $canvas.setAttribute('height', $memeImageSize.clientHeight);
+  draw();
 });
 
 $memeTopInput.addEventListener('input', function (event) {
@@ -319,8 +322,6 @@ function openPhotoInMemeView(photoURL) {
 }
 
 var $canvas = document.querySelector('canvas');
-var canvasWidth = $canvas.clientWidth;
-var canvasHeight = $canvas.clientHeight;
 
 var ctx = $canvas.getContext('2d');
 
@@ -329,7 +330,7 @@ img.src = data.meme;
 img.addEventListener('load', draw);
 
 function draw() {
-  ctx.drawImage(img, 0, 0, canvasWidth, canvasHeight);
-  ctx.font = 'min(calc(' + $memeImageSize.clientWidth + 'px / ' + $memeTopText.length + '), 3rem) sans-serif';
+  ctx.drawImage(img, 0, 0, $memeImageSize.clientWidth, $memeImageSize.clientHeight);
+  ctx.font = '3rem sans-serif';
   ctx.strokeText($memeTopInput.value, 10, 50);
 }
