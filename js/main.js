@@ -208,6 +208,10 @@ function modalHandler(targetCell) {
   $modal.addEventListener('click', function (event) {
     if (event.target === $modal.querySelector('.fa-times-circle')) {
       $modal.classList.add('hidden');
+    } else if (event.target === $modal.querySelector('.fa-pen')) {
+      console.log(targetCell);
+      $modal.classList.add('hidden');
+      openPhotoInMemeView(targetCell.querySelector('.cell-image').getAttribute('src'));
     } else if (event.target === $heart) {
       if (data.favorites.includes(cellDataM)) {
         cellDataM.favorited = false;
@@ -272,6 +276,10 @@ function switchViews(targetview) {
 var $memeImageSize = document.querySelector('.meme-image');
 var $memeImage = document.querySelector('.meme-image img');
 
+if (data.meme) {
+  $memeImage.setAttribute('src', data.meme);
+}
+
 var $memeTopText = document.querySelector('.top-text');
 var $memeBottomText = document.querySelector('.bottom-text');
 
@@ -304,6 +312,7 @@ function calculateFontSize(textNode, textLength) {
 
 function openPhotoInMemeView(photoURL) {
   console.log(photoURL);
-  $memeImage.setAttribute('src', photoURL);
+  data.meme = photoURL;
+  $memeImage.setAttribute('src', data.meme);
   switchViews('meme-view');
 }
