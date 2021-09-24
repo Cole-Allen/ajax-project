@@ -1,0 +1,98 @@
+.meme-view {
+  margin-bottom: 100px;
+}
+
+.meme-title {
+  font-size: 3rem;
+  flex-basis: 100%;
+  margin-bottom: 30px;
+}
+
+h2 {
+  text-align: center;
+  margin-bottom: 40px;
+  background: rgb(129, 29, 29);
+  padding: 20px;
+  border-radius: 10px;
+  border: 2px solid rgb(255, 136, 0);
+  flex-basis: 100%;
+}
+
+.meme-image {
+  width: 15%;
+  flex-basis: 50%;
+  position: relative;
+}
+
+.meme-form {
+  display: flex;
+  flex-wrap: wrap;
+  flex-basis: 50%;
+  justify-content: flex-end;
+  align-content: flex-start;
+  padding: 0 30px;
+}
+
+.meme-inputs {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.meme-inputs label {
+  font-size: 2rem;
+  flex-basis: 100%;
+  margin-bottom: 20px;
+  margin-left: 12px;
+}
+
+.meme-inputs input {
+  font-size: 1.5rem;
+  padding: 20px;
+  flex-basis: 100%;
+  margin-bottom: 20px;
+  border-radius: 10px;
+  border: 3px solid transparent;
+}
+
+.meme-inputs input:focus {
+  border: 3px solid #00ab7d;
+  outline: none;
+}
+
+.download-meme {
+  color: white;
+  font-size: 2rem;
+  font-weight: 900;
+  border: none;
+  background: #00ab7d;
+  border-radius: 10px;
+  padding: 10px 20px;
+  margin-top: 30px;
+}
+
+.meme-text {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  left: 0;
+  font-family: 'Poppins-Bold', 'Poppins', sans-serif;
+  font-weight: 700;
+  overflow-wrap: break-word;
+  overflow: hidden;
+}
+
+@media screen and (max-width: 900px) {
+  .meme-image,
+  .meme-form {
+    flex-basis: 100%;
+  }
+
+  .meme-form {
+    margin-top: 20px;
+  }
+}

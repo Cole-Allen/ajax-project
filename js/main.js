@@ -1,24 +1,42 @@
 var catImages = {
   entries: [],
-  cells: []
+  cells: [],
+  unfaved: []
 };
+
+var randAmount = 20;
+
+var $views = document.querySelectorAll('.view');
 
 var $headerLogo = document.querySelector('.header-logo');
 var $headerFavorites = document.querySelector('.header-favorites');
 
-var $imageColumns = document.querySelectorAll('.column');
+var $imageColumns = document.querySelectorAll('.main-view .column');
+var $favImageColumns = document.querySelectorAll('.fav-view .column');
 var $modal = document.querySelector('.modal');
 
-getRandomImages(20); // Populates the page with 20 random images from the API
+var $memeImageSize = document.querySelector('.meme-image');
+var $memeImage = document.querySelector('.meme-image img');
+
+var $memeTopText = document.querySelector('.top-text');
+var $memeBottomText = document.querySelector('.bottom-text');
+
+var $memeTopInput = document.getElementById('top-text');
+var $memeBottomInput = document.getElementById('bottom-text');
+
+var $canvas = document.querySelector('canvas');
+var $memeSaveButton = document.querySelector('.meme-form .download-meme');
+
+var ctx = $canvas.getContext('2d');
+
+switchViews(data.view);
 
 $headerFavorites.addEventListener('click', function (event) {
-  $headerFavorites.classList.add('favorites-view');
   switchViews('favorites');
 });
 
 $headerLogo.addEventListener('click', function (event) {
-  $headerFavorites.classList.remove('favorites-view');
-  switchViews('buit');
+  switchViews('main-view');
 });
 
 function getRandomImages(amount) {
@@ -29,24 +47,27 @@ function getRandomImages(amount) {
     catPhotos.send();
 
   }
-  assignCellstoColumn(catImages.entries);
+  if (data.view === 'main-view') {
+    assignCellstoColumn(catImages.entries, $imageColumns);
+  }
 }
 
 function loadCatPhotos() {
 
   var translatedJSON = JSON.parse(this.responseText);
-  var cell = createImageCell(translatedJSON.file, data.nextID, false);
+
   var cellData = {};
   cellData.ID = data.nextID; // The Cell ID
   cellData.imageURL = translatedJSON.file; // The Image URL
   for (var i = 0; i < data.favorites.length; i++) {
     if (cellData.imageURL === data.favorites[i].imageURL) {
       cellData.favorited = true;
+      break;
     } else {
       cellData.favorited = false;
     }
   }
-  // cellData.favorited = false; // Lets the page know if the hearts should already be filled in
+  var cell = createImageCell(translatedJSON.file, data.nextID, cellData.favorited);
   cellData.cell = cell; // The cell that shows up on the grid.Needed to get the heart on the grid view
 
   catImages.entries.push(cellData); // Shows current random entries. Length should not be larger than the amount parameter of the getRandomIMages function
@@ -54,28 +75,28 @@ function loadCatPhotos() {
   data.nextID++; // Makes sure no cells share the same id
 
   // $imagegrid.appendChild(cell); // Adds the Cell to the grid view
-  assignCellstoColumn(catImages.cells);
+  assignCellstoColumn(catImages.cells, $imageColumns);
 }
 
-function assignCellstoColumn(cellArray) {
+function assignCellstoColumn(cellArray, columns) {
   var column = 0;
   for (var i = 0; i < cellArray.length; i++) {
     var cell = cellArray[i];
     switch (column) {
       case 0:
-        $imageColumns[0].appendChild(cell);
+        columns[0].appendChild(cell);
         column++;
         break;
       case 1:
-        $imageColumns[1].appendChild(cell);
+        columns[1].appendChild(cell);
         column++;
         break;
       case 2:
-        $imageColumns[2].appendChild(cell);
+        columns[2].appendChild(cell);
         column++;
         break;
       case 3:
-        $imageColumns[3].appendChild(cell);
+        columns[3].appendChild(cell);
         column = 0;
         break;
     }
@@ -108,7 +129,7 @@ function createImageCell(imageURL, id, favorited) {
 
   if (favorited) {
     $pen.setAttribute('class', 'fas fa-pen');
-    $heart.setAttribute('class', 'fas fa-heart');
+    $heart.setAttribute('class', 'fas fa-heart faved');
   } else {
     $pen.setAttribute('class', 'fas fa-pen');
     $heart.setAttribute('class', 'far fa-heart');
@@ -129,29 +150,45 @@ function createImageCell(imageURL, id, favorited) {
 
 }
 
-function cellEventListener(event) { //! !!!!! Need to fix so that it works without relying on data.entries!!!!!!!!!!!
-  // Handle favorites in 'cell' view
-  if (event.target.getAttribute('icon') === 'heart') {
-    for (var i = 0; i < catImages.entries.length; i++) {
-      if (catImages.entries[i].ID.toString() === event.currentTarget.getAttribute('cell-id') && !data.favorites.includes(catImages.entries[i])) {
-        data.favorites.push(catImages.entries[i]);
-        catImages.entries[i].favorited = true;
-        event.target.classList.remove('far');
-        event.target.classList.add('fas');
-      } else if (catImages.entries[i].ID.toString() === event.currentTarget.getAttribute('cell-id') && data.favorites.includes(catImages.entries[i])) {
-        data.favorites.splice(data.favorites.indexOf(catImages.entries[i]), 1);
-        catImages.entries[i].favorited = false;
-        event.target.classList.remove('fas');
-        event.target.classList.add('far');
-      }
-    }
-  } else if (event.target.getAttribute('image-id')) {
-    for (var j = 0; j < catImages.entries.length; j++) {
-      if (event.currentTarget.getAttribute('cell-id') === catImages.entries[j].ID.toString()) {
-        whenImageClicked(event.target.getAttribute('src'), catImages.entries[j]);
-      }
-    }
+function cellEventListener(event) {
 
+  if (event.target.getAttribute('icon') === 'heart') {
+    for (var i = 0; i < data.favorites.length; i++) {
+      if (data.favorites[i].ID.toString() === event.currentTarget.getAttribute('cell-id')) {
+        unfavoriteHandler(event);
+        return;
+      }
+    }
+    favoriteHandler(event);
+  } else if (event.target.getAttribute('icon') === 'edit') {
+    openPhotoInMemeView(event.currentTarget.querySelector('.cell-image').getAttribute('src'));
+  } else if (event.target.getAttribute('src')) {
+    whenImageClicked(event.target.getAttribute('src'), event.currentTarget);
+  }
+}
+
+function favoriteHandler(event) {
+  for (var i = 0; i < catImages.entries.length; i++) {
+    if (event.currentTarget.getAttribute('cell-id') === catImages.entries[i].ID.toString()) {
+      catImages.entries[i].favorited = true;
+      data.favorites.push(catImages.entries[i]);
+      event.target.classList.remove('far');
+      event.target.classList.add('fas');
+      event.target.classList.add('faved');
+    }
+  }
+}
+
+function unfavoriteHandler(event) {
+
+  for (var i = 0; i < data.favorites.length; i++) {
+    if (event.currentTarget.getAttribute('cell-id') === data.favorites[i].ID.toString()) {
+      data.favorites[i].favorited = false;
+      data.favorites.splice(data.favorites.indexOf(data.favorites[i]), 1);
+      event.target.classList.remove('fas');
+      event.target.classList.add('far');
+      event.target.classList.remove('faved');
+    }
   }
 }
 
@@ -163,59 +200,161 @@ function whenImageClicked(url, targetCell) {
 }
 
 function modalHandler(targetCell) {
+  var cellDataM = null;
   var $heart = $modal.querySelector('.fa-heart');
-  var $cellHeart = targetCell.cell.querySelector('.fa-heart'); // Links the heart effect to the grid view cell
-  if (data.favorites.includes(targetCell)) {
+  var $cellHeart = targetCell.querySelector('.fa-heart'); // Links the heart effect to the grid view cell
+  for (var p = 0; p < catImages.entries.length; p++) {
+    if (catImages.entries[p].ID.toString() === targetCell.getAttribute('cell-id')) {
+      cellDataM = catImages.entries[p];
+    }
+  }
+
+  if (cellDataM.favorited) {
     $heart.classList.remove('far');
     $heart.classList.add('fas');
+    $heart.classList.add('faved');
   } else {
-    $heart.classList.remove('fas');
     $heart.classList.add('far');
+    $heart.classList.remove('fas');
+    $heart.classList.remove('faved');
   }
+
   $modal.addEventListener('click', function (event) {
     if (event.target === $modal.querySelector('.fa-times-circle')) {
       $modal.classList.add('hidden');
-    }
-    if (event.target === $heart && !data.favorites.includes(targetCell)) {
-      data.favorites.push(targetCell);
-      event.target.favorited = true;
-      $cellHeart.classList.remove('far');
-      $cellHeart.classList.add('fas');
-      $heart.classList.remove('far');
-      $heart.classList.add('fas');
-    } else if (event.target === $heart && data.favorites.includes(targetCell)) {
-      event.target.favorited = false;
-      data.favorites.splice(data.favorites.indexOf(targetCell), 1);
-      $heart.classList.add('far');
-      $heart.classList.remove('fas');
+    } else if (event.target === $modal.querySelector('.fa-pen')) {
+      $modal.classList.add('hidden');
+      openPhotoInMemeView(targetCell.querySelector('.cell-image').getAttribute('src'));
+    } else if (event.target === $modal.querySelector('.fa-download')) {
+      $modal.querySelector('.download-anchor').setAttribute('href', cellDataM.imageURL);
+    } else if (event.target === $heart) {
+      if (data.favorites.includes(cellDataM)) {
+        cellDataM.favorited = false;
+        data.favorites.splice(data.favorites.indexOf(cellDataM), 1);
+        $cellHeart.classList.add('far');
+        $cellHeart.classList.remove('fas');
+        $cellHeart.classList.remove('faved');
+        $heart.classList.add('far');
+        $heart.classList.remove('fas');
+        $heart.classList.remove('faved');
+      } else {
+        cellDataM.favorited = true;
+        data.favorites.push(cellDataM);
+        $cellHeart.classList.remove('far');
+        $cellHeart.classList.add('fas');
+        $cellHeart.classList.add('faved');
+        $heart.classList.remove('far');
+        $heart.classList.add('fas');
+        $heart.classList.add('faved');
+      }
     }
   });
 }
 
 function switchViews(targetview) {
-  while ($imageColumns[0].firstChild) {
-    $imageColumns[0].removeChild($imageColumns[0].firstChild);
+  data.view = targetview;
+  for (var d = 0; d < $imageColumns.length; d++) {
+    while ($imageColumns[d].firstChild) {
+      $imageColumns[d].removeChild($imageColumns[d].firstChild);
+    }
   }
-  while ($imageColumns[1].firstChild) {
-    $imageColumns[1].removeChild($imageColumns[1].firstChild);
+
+  for (var a = 0; a < $favImageColumns.length; a++) {
+    while ($favImageColumns[a].firstChild) {
+      $favImageColumns[a].removeChild($favImageColumns[a].firstChild);
+    }
   }
-  while ($imageColumns[2].firstChild) {
-    $imageColumns[2].removeChild($imageColumns[2].firstChild);
-  }
-  while ($imageColumns[3].firstChild) {
-    $imageColumns[3].removeChild($imageColumns[3].firstChild);
+
+  for (var i = 0; i < $views.length; i++) {
+    $views[i].classList.add('hidden');
+    if ($views[i].getAttribute('data-view') === targetview) {
+      $views[i].classList.remove('hidden');
+    }
   }
   if (targetview === 'favorites') {
+    $headerFavorites.classList.add('favorites-view');
     var favoriteCells = [];
-    for (var i = 0; i < data.favorites.length; i++) {
-      favoriteCells.push(createImageCell(data.favorites[i].imageURL, data.favorites[i].ID, data.favorites[i].favorited));
+    for (var j = 0; j < data.favorites.length; j++) {
+      favoriteCells.push(createImageCell(data.favorites[j].imageURL, data.favorites[j].ID, data.favorites[j].favorited));
     }
-    assignCellstoColumn(favoriteCells);
+    assignCellstoColumn(favoriteCells, $favImageColumns);
   } else {
+    $headerFavorites.classList.remove('favorites-view');
     catImages = {
       entries: [],
       cells: []
     };
-    getRandomImages(20);
+    getRandomImages(randAmount);
   }
 }
+
+if (data.meme) {
+  $memeImage.setAttribute('src', data.meme);
+}
+
+calculateFontSize($memeTopText, $memeTopText.textContent.length);
+calculateFontSize($memeBottomText, $memeBottomText.textContent.length);
+
+window.addEventListener('resize', function (event) {
+  calculateFontSize($memeTopText, $memeTopText.textContent.length);
+  calculateFontSize($memeBottomText, $memeBottomText.textContent.length);
+  draw();
+});
+
+$memeTopInput.addEventListener('input', function (event) {
+  $memeTopText.textContent = $memeTopInput.value;
+  calculateFontSize($memeTopText, $memeTopText.textContent.length);
+  draw();
+
+});
+
+$memeBottomInput.addEventListener('input', function (event) {
+  $memeBottomText.textContent = $memeBottomInput.value;
+  calculateFontSize($memeBottomText, $memeBottomText.textContent.length);
+  draw();
+});
+
+function calculateFontSize(textNode, textLength) {
+  if (textLength <= 15) {
+    textNode.style.fontSize = 'min(calc(' + $memeImageSize.clientWidth + 'px / ' + textLength + '), 3rem)'; // Will need to change the max so that it will work on VERY large monitors
+  }
+}
+
+function openPhotoInMemeView(photoURL) {
+  data.meme = photoURL;
+  $memeImage.setAttribute('src', data.meme);
+  loadImage();
+  switchViews('meme-view');
+}
+
+function loadImage() {
+  var img = new Image();
+  img.src = data.meme;
+  img.addEventListener('load', draw);
+}
+
+loadImage();
+
+function draw() {
+
+  $canvas.setAttribute('width', $memeImage.width);
+  $canvas.setAttribute('height', $memeImage.height);
+  ctx.clearRect(0, 0, $canvas.width, $canvas.height);
+  // ctx.drawImage(img, 0, 0, $memeImageSize.clientWidth, $memeImageSize.clientHeight);
+  ctx.lineWidth = 10;
+  ctx.strokeStyle = 'black';
+  ctx.font = '3rem sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillStyle = 'rgb(255, 255, 255)';
+  ctx.miterLimit = 2;
+  ctx.strokeText($memeTopInput.value, $memeImage.clientWidth / 2, 50, $memeImage.clientWidth);
+  ctx.fillText($memeTopInput.value, $memeImage.clientWidth / 2, 50, $memeImage.clientWidth);
+
+  ctx.strokeText($memeBottomInput.value, $memeImage.clientWidth / 2, $memeImage.clientHeight - 20, $memeImage.clientWidth);
+  ctx.fillText($memeBottomInput.value, $memeImage.clientWidth / 2, $memeImage.clientHeight - 20, $memeImage.clientWidth);
+
+}
+
+$memeSaveButton.addEventListener('click', function () {
+  $memeSaveButton.setAttribute('href', $canvas.toDataURL());
+});
