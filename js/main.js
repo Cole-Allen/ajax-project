@@ -322,6 +322,8 @@ function openPhotoInMemeView(photoURL) {
 }
 
 var $canvas = document.querySelector('canvas');
+$canvas.setAttribute('width', $memeImageSize.clientWidth);
+$canvas.setAttribute('height', $memeImageSize.clientHeight);
 
 var ctx = $canvas.getContext('2d');
 
@@ -331,6 +333,13 @@ img.addEventListener('load', draw);
 
 function draw() {
   ctx.drawImage(img, 0, 0, $memeImageSize.clientWidth, $memeImageSize.clientHeight);
+  ctx.lineWidth = 10;
+  ctx.strokeStyle = 'black';
   ctx.font = '3rem sans-serif';
-  ctx.strokeText($memeTopInput.value, 10, 50);
+  ctx.textAlign = 'center';
+  ctx.fillStyle = 'rgb(255, 255, 255)';
+  ctx.miterLimit = 2;
+  ctx.strokeText($memeTopInput.value, $memeImageSize.clientWidth / 2, 50, $memeImageSize.clientWidth);
+  ctx.fillText($memeTopInput.value, $memeImageSize.clientWidth / 2, 50, $memeImageSize.clientWidth);
+
 }
