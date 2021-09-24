@@ -209,9 +209,10 @@ function modalHandler(targetCell) {
     if (event.target === $modal.querySelector('.fa-times-circle')) {
       $modal.classList.add('hidden');
     } else if (event.target === $modal.querySelector('.fa-pen')) {
-      console.log(targetCell);
       $modal.classList.add('hidden');
       openPhotoInMemeView(targetCell.querySelector('.cell-image').getAttribute('src'));
+    } else if (event.target === $modal.querySelector('.fa-download')) {
+      // add download system here
     } else if (event.target === $heart) {
       if (data.favorites.includes(cellDataM)) {
         cellDataM.favorited = false;
@@ -305,13 +306,12 @@ $memeBottomInput.addEventListener('input', function (event) {
 });
 
 function calculateFontSize(textNode, textLength) {
-  if (textLength <= 12) {
-    textNode.style.fontSize = 'min(calc(' + $memeImageSize.clientWidth + 'px / ' + textLength + ' * 1.2), 8rem)'; // Will need to change the max so that it will work on VERY large monitors
+  if (textLength <= 15) {
+    textNode.style.fontSize = 'min(calc(' + $memeImageSize.clientWidth + 'px / ' + textLength + '), 3rem)'; // Will need to change the max so that it will work on VERY large monitors
   }
 }
 
 function openPhotoInMemeView(photoURL) {
-  console.log(photoURL);
   data.meme = photoURL;
   $memeImage.setAttribute('src', data.meme);
   switchViews('meme-view');
