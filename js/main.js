@@ -297,6 +297,7 @@ window.addEventListener('resize', function (event) {
 $memeTopInput.addEventListener('input', function (event) {
   $memeTopText.textContent = $memeTopInput.value;
   calculateFontSize($memeTopText, $memeTopText.textContent.length);
+  draw();
 
 });
 
@@ -315,4 +316,20 @@ function openPhotoInMemeView(photoURL) {
   data.meme = photoURL;
   $memeImage.setAttribute('src', data.meme);
   switchViews('meme-view');
+}
+
+var $canvas = document.querySelector('canvas');
+var canvasWidth = $canvas.clientWidth;
+var canvasHeight = $canvas.clientHeight;
+
+var ctx = $canvas.getContext('2d');
+
+var img = new Image();
+img.src = data.meme;
+img.addEventListener('load', draw);
+
+function draw() {
+  ctx.drawImage(img, 0, 0, canvasWidth, canvasHeight);
+  ctx.font = 'min(calc(' + $memeImageSize.clientWidth + 'px / ' + $memeTopText.length + '), 3rem) sans-serif';
+  ctx.strokeText($memeTopInput.value, 10, 50);
 }
