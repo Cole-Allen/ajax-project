@@ -88,3 +88,8 @@ a {
 .faved {
   color: rgb(255, 58, 101);
 }
+
+.left-row {
+  display: flex;
+  flex-wrap: wrap;
+}
