@@ -358,3 +358,14 @@ function draw() {
 $memeSaveButton.addEventListener('click', function () {
   $memeSaveButton.setAttribute('href', $canvas.toDataURL());
 });
+
+var $darkToggle = document.querySelector('.switch input');
+
+$darkToggle.addEventListener('change', function (event) {
+  var $body = document.querySelector('body');
+  if ($darkToggle.checked) {
+    $body.style.background = '#242e30';
+  } else {
+    $body.style.background = '#c9f6d2';
+  }
+});

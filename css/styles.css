@@ -1,7 +1,9 @@
+
 body {
   font-family: 'Poppins', sans-serif;
   color: white;
-  background: #242e30;
+  background: #c9f6d2;
+  transition: 0.4s;
 }
 
 header {
@@ -11,6 +13,7 @@ header {
 
 i {
   margin: 0 10px;
+  transition: 0.2s;
 }
 
 a {
@@ -113,7 +116,7 @@ a {
   bottom: 0;
   left: 0;
   right: 0;
-  background: rgba(0, 0, 0, 0.24);
+  background: #c9f6d2;
   border-radius: 50px;
   transition: 0.4s;
 }
@@ -123,15 +126,16 @@ a {
   content: "";
   height: 30px;
   width: 30px;
-  background: white;
-  border-radius: 50px;
+  background: #093034;
+  border-radius: 100px;
   transition: 0.4s;
 }
 
 .switch input:checked + .slider {
-  background: rgb(255, 0, 0);
+  background: #093034;
 }
 
 .switch input:checked + .slider::before {
   transform: translateX(30px);
+  background: #c9f6d2;
 }
