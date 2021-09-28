@@ -360,12 +360,19 @@ $memeSaveButton.addEventListener('click', function () {
 });
 
 var $darkToggle = document.querySelector('.switch input');
+var $body = document.querySelector('body');
+
+if (data.dark) {
+  $darkToggle.checked = true;
+  $body.style.background = '#242e30';
+}
 
 $darkToggle.addEventListener('change', function (event) {
-  var $body = document.querySelector('body');
   if ($darkToggle.checked) {
     $body.style.background = '#242e30';
+    data.dark = true;
   } else {
     $body.style.background = '#c9f6d2';
+    data.dark = false;
   }
 });
