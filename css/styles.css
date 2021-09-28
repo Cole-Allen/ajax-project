@@ -1,7 +1,9 @@
+
 body {
   font-family: 'Poppins', sans-serif;
   color: white;
-  background: #242e30;
+  background: #c9f6d2;
+  transition: 0.4s;
 }
 
 header {
@@ -11,6 +13,7 @@ header {
 
 i {
   margin: 0 10px;
+  transition: 0.2s;
 }
 
 a {
@@ -87,4 +90,52 @@ a {
 
 .faved {
   color: rgb(255, 58, 101);
+}
+
+.left-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 60px;
+  height: 30px;
+  margin-left: 20px;
+}
+
+.switch input {
+  display: none;
+}
+
+.slider {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #c9f6d2;
+  border-radius: 50px;
+  transition: 0.4s;
+}
+
+.slider::before {
+  position: absolute;
+  content: "";
+  height: 30px;
+  width: 30px;
+  background: #093034;
+  border-radius: 100px;
+  transition: 0.4s;
+}
+
+.switch input:checked + .slider {
+  background: #093034;
+}
+
+.switch input:checked + .slider::before {
+  transform: translateX(30px);
+  background: #c9f6d2;
 }

@@ -4,7 +4,8 @@ var data = {
   favorites: [],
   nextID: 0,
   view: 'main-view',
-  meme: null
+  meme: null,
+  dark: false
 };
 
 window.addEventListener('beforeunload', function (event) {
