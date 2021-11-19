@@ -1,6 +1,6 @@
 /* exported data */
 
-var data = {
+let data = {
   favorites: [],
   nextID: 0,
   view: 'main-view',
@@ -10,11 +10,11 @@ var data = {
 
 window.addEventListener('beforeunload', function (event) {
 
-  var dataStringified = JSON.stringify(data);
+  const dataStringified = JSON.stringify(data);
   localStorage.setItem('cat-data', dataStringified);
 });
 
-var previousData = localStorage.getItem('cat-data');
+const previousData = localStorage.getItem('cat-data');
 
 if (previousData) {
   data = JSON.parse(previousData);

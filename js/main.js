@@ -1,33 +1,34 @@
-var catImages = {
+let catImages = {
   entries: [],
   cells: [],
   unfaved: []
 };
 
-var randAmount = 20;
+const randAmount = 20;
 
-var $views = document.querySelectorAll('.view');
+const $views = document.querySelectorAll('.view');
 
-var $headerLogo = document.querySelector('.header-logo');
-var $headerFavorites = document.querySelector('.header-favorites');
+const $headerLogo = document.querySelector('.header-logo');
+const $headerFavorites = document.querySelector('.header-favorites');
 
-var $imageColumns = document.querySelectorAll('.main-view .column');
-var $favImageColumns = document.querySelectorAll('.fav-view .column');
-var $modal = document.querySelector('.modal');
+const $imageColumns = document.querySelectorAll('.main-view .column');
+const $favImageColumns = document.querySelectorAll('.fav-view .column');
+const $modal = document.querySelector('.modal');
 
-var $memeImageSize = document.querySelector('.meme-image');
-var $memeImage = document.querySelector('.meme-image img');
+const $memeImageSize = document.querySelector('.meme-image');
+const $memeImage = document.querySelector('.meme-image img');
 
-var $memeTopText = document.querySelector('.top-text');
-var $memeBottomText = document.querySelector('.bottom-text');
+const $memeTopText = document.querySelector('.top-text');
+const $memeBottomText = document.querySelector('.bottom-text');
 
-var $memeTopInput = document.getElementById('top-text');
-var $memeBottomInput = document.getElementById('bottom-text');
+const $memeTopInput = document.getElementById('top-text');
+const $memeBottomInput = document.getElementById('bottom-text');
 
-var $canvas = document.querySelector('canvas');
-var $memeSaveButton = document.querySelector('.meme-form .download-meme');
+const $canvas = document.querySelector('canvas');
+const $memeSaveButton = document.querySelector('.meme-form .download-meme');
 
-var ctx = $canvas.getContext('2d');
+const ctx = $canvas.getContext('2d');
+const loadingModal = document.querySelector('.loading-modal');
 
 switchViews(data.view);
 
@@ -40,9 +41,14 @@ $headerLogo.addEventListener('click', function (event) {
 });
 
 function getRandomImages(amount) {
-  for (var i = 0; i < amount; i++) {
-    var catPhotos = new XMLHttpRequest();
-    catPhotos.addEventListener('load', loadCatPhotos);
+  for (let i = 0; i < amount; i++) {
+    const catPhotos = new XMLHttpRequest();
+    catPhotos.addEventListener('load', function () {
+      loadCatPhotos(this);
+      if (i === randAmount - 1) {
+        loadingModal.classList.add('hidden');
+      }
+    });
     catPhotos.open('GET', 'https://aws.random.cat/meow');
     catPhotos.send();
 
@@ -52,14 +58,14 @@ function getRandomImages(amount) {
   }
 }
 
-function loadCatPhotos() {
+function loadCatPhotos(e) {
 
-  var translatedJSON = JSON.parse(this.responseText);
+  const translatedJSON = JSON.parse(e.responseText);
 
-  var cellData = {};
+  const cellData = {};
   cellData.ID = data.nextID; // The Cell ID
   cellData.imageURL = translatedJSON.file; // The Image URL
-  for (var i = 0; i < data.favorites.length; i++) {
+  for (let i = 0; i < data.favorites.length; i++) {
     if (cellData.imageURL === data.favorites[i].imageURL) {
       cellData.favorited = true;
       break;
@@ -67,7 +73,7 @@ function loadCatPhotos() {
       cellData.favorited = false;
     }
   }
-  var cell = createImageCell(translatedJSON.file, data.nextID, cellData.favorited);
+  const cell = createImageCell(translatedJSON.file, data.nextID, cellData.favorited);
   cellData.cell = cell; // The cell that shows up on the grid.Needed to get the heart on the grid view
 
   catImages.entries.push(cellData); // Shows current random entries. Length should not be larger than the amount parameter of the getRandomIMages function
@@ -79,9 +85,9 @@ function loadCatPhotos() {
 }
 
 function assignCellstoColumn(cellArray, columns) {
-  var column = 0;
-  for (var i = 0; i < cellArray.length; i++) {
-    var cell = cellArray[i];
+  let column = 0;
+  for (let i = 0; i < cellArray.length; i++) {
+    const cell = cellArray[i];
     switch (column) {
       case 0:
         columns[0].appendChild(cell);
@@ -107,21 +113,21 @@ function assignCellstoColumn(cellArray, columns) {
 // Creates the Cell container in the DOM
 
 function createImageCell(imageURL, id, favorited) {
-  var $cell = document.createElement('div');
-  var $imageBox = document.createElement('div');
-  var $imageOverlay = document.createElement('div');
-  var $imgA = document.createElement('a');
-  var $image = document.createElement('img');
-  var $penA = document.createElement('a');
-  var $heartA = document.createElement('a');
-  var $pen = document.createElement('i');
-  var $heart = document.createElement('i');
+  const $cell = document.createElement('div');
+  const $imageBox = document.createElement('div');
+  const $imageOverlay = document.createElement('div');
+  const $imgA = document.createElement('a');
+  const $image = document.createElement('img');
+  const $penA = document.createElement('a');
+  const $heartA = document.createElement('a');
+  const $pen = document.createElement('i');
+  const $heart = document.createElement('i');
 
   $cell.setAttribute('class', 'cell');
   $cell.setAttribute('cell-id', id);
   $imageBox.setAttribute('class', 'image-box');
   $imageOverlay.setAttribute('class', 'image-overlay');
-  $image.setAttribute('src', imageURL);
+  $image.setAttribute('src', imageURL || './images/times-circle.svg');
   $image.setAttribute('class', 'cell-image');
   $image.setAttribute('image-id', id);
   $pen.setAttribute('icon', 'edit');
@@ -153,7 +159,7 @@ function createImageCell(imageURL, id, favorited) {
 function cellEventListener(event) {
 
   if (event.target.getAttribute('icon') === 'heart') {
-    for (var i = 0; i < data.favorites.length; i++) {
+    for (let i = 0; i < data.favorites.length; i++) {
       if (data.favorites[i].ID.toString() === event.currentTarget.getAttribute('cell-id')) {
         unfavoriteHandler(event);
         return;
@@ -168,7 +174,7 @@ function cellEventListener(event) {
 }
 
 function favoriteHandler(event) {
-  for (var i = 0; i < catImages.entries.length; i++) {
+  for (let i = 0; i < catImages.entries.length; i++) {
     if (event.currentTarget.getAttribute('cell-id') === catImages.entries[i].ID.toString()) {
       catImages.entries[i].favorited = true;
       data.favorites.push(catImages.entries[i]);
@@ -181,7 +187,7 @@ function favoriteHandler(event) {
 
 function unfavoriteHandler(event) {
 
-  for (var i = 0; i < data.favorites.length; i++) {
+  for (let i = 0; i < data.favorites.length; i++) {
     if (event.currentTarget.getAttribute('cell-id') === data.favorites[i].ID.toString()) {
       data.favorites[i].favorited = false;
       data.favorites.splice(data.favorites.indexOf(data.favorites[i]), 1);
@@ -200,10 +206,10 @@ function whenImageClicked(url, targetCell) {
 }
 
 function modalHandler(targetCell) {
-  var cellDataM = null;
-  var $heart = $modal.querySelector('.fa-heart');
-  var $cellHeart = targetCell.querySelector('.fa-heart'); // Links the heart effect to the grid view cell
-  for (var p = 0; p < catImages.entries.length; p++) {
+  let cellDataM = null;
+  const $heart = $modal.querySelector('.fa-heart');
+  const $cellHeart = targetCell.querySelector('.fa-heart'); // Links the heart effect to the grid view cell
+  for (let p = 0; p < catImages.entries.length; p++) {
     if (catImages.entries[p].ID.toString() === targetCell.getAttribute('cell-id')) {
       cellDataM = catImages.entries[p];
     }
@@ -253,19 +259,19 @@ function modalHandler(targetCell) {
 
 function switchViews(targetview) {
   data.view = targetview;
-  for (var d = 0; d < $imageColumns.length; d++) {
+  for (let d = 0; d < $imageColumns.length; d++) {
     while ($imageColumns[d].firstChild) {
       $imageColumns[d].removeChild($imageColumns[d].firstChild);
     }
   }
 
-  for (var a = 0; a < $favImageColumns.length; a++) {
+  for (let a = 0; a < $favImageColumns.length; a++) {
     while ($favImageColumns[a].firstChild) {
       $favImageColumns[a].removeChild($favImageColumns[a].firstChild);
     }
   }
 
-  for (var i = 0; i < $views.length; i++) {
+  for (let i = 0; i < $views.length; i++) {
     $views[i].classList.add('hidden');
     if ($views[i].getAttribute('data-view') === targetview) {
       $views[i].classList.remove('hidden');
@@ -273,8 +279,8 @@ function switchViews(targetview) {
   }
   if (targetview === 'favorites') {
     $headerFavorites.classList.add('favorites-view');
-    var favoriteCells = [];
-    for (var j = 0; j < data.favorites.length; j++) {
+    const favoriteCells = [];
+    for (let j = 0; j < data.favorites.length; j++) {
       favoriteCells.push(createImageCell(data.favorites[j].imageURL, data.favorites[j].ID, data.favorites[j].favorited));
     }
     assignCellstoColumn(favoriteCells, $favImageColumns);
@@ -328,7 +334,7 @@ function openPhotoInMemeView(photoURL) {
 }
 
 function loadImage() {
-  var img = new Image();
+  const img = new Image();
   img.src = data.meme;
   img.addEventListener('load', draw);
 }
@@ -359,8 +365,8 @@ $memeSaveButton.addEventListener('click', function () {
   $memeSaveButton.setAttribute('href', $canvas.toDataURL());
 });
 
-var $darkToggle = document.querySelector('.switch input');
-var $body = document.querySelector('body');
+const $darkToggle = document.querySelector('.switch input');
+const $body = document.querySelector('body');
 
 if (data.dark) {
   $darkToggle.checked = true;
