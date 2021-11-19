@@ -29,6 +29,7 @@ const $memeSaveButton = document.querySelector('.meme-form .download-meme');
 
 const ctx = $canvas.getContext('2d');
 const loadingModal = document.querySelector('.loading-modal');
+let errorCount = 0;
 
 switchViews(data.view);
 
@@ -48,6 +49,15 @@ function getRandomImages(amount) {
       if (i === randAmount - 1) {
         loadingModal.classList.add('hidden');
       }
+    });
+    catPhotos.addEventListener('error', () => {
+      if (errorCount === 0) {
+        const err = document.createElement('div');
+        err.textContent = 'You are not connected to the internet';
+        loadingModal.querySelector('.loading-icon').appendChild(err);
+        errorCount++;
+      }
+
     });
     catPhotos.open('GET', 'https://aws.random.cat/meow');
     catPhotos.send();

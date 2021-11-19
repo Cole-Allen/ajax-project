@@ -157,6 +157,10 @@ a {
   border: 2px solid rgb(0, 255, 123);
   border-radius: 10px;
   padding: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 
 .lds-grid {
