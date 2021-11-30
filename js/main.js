@@ -28,8 +28,6 @@ const $canvas = document.querySelector('canvas');
 const $memeSaveButton = document.querySelector('.meme-form .download-meme');
 
 const ctx = $canvas.getContext('2d');
-const loadingModal = document.querySelector('.loading-modal');
-let errorCount = 0;
 
 switchViews(data.view);
 
@@ -43,20 +41,28 @@ $headerLogo.addEventListener('click', function (event) {
 
 function getRandomImages(amount) {
   for (let i = 0; i < amount; i++) {
+    const cellData = {};
+    cellData.ID = data.nextID; // The Cell ID
+    data.nextID++;
+    const cell = createImageCell(cellData.ID, cellData.favorited);
+
+    catImages.entries.push(cellData); // Shows current random entries. Length should not be larger than the amount parameter of the getRandomIMages function
+    catImages.cells.push(cell);
     const catPhotos = new XMLHttpRequest();
     catPhotos.addEventListener('load', function () {
-      loadCatPhotos(this);
-      if (i === randAmount - 1) {
-        loadingModal.classList.add('hidden');
-      }
+      const translatedJSON = JSON.parse(this.responseText);
+      const $cell = document.getElementById(cellData.ID);
+      const $cellImage = $cell.querySelector('.cell-image');
+      $cellImage.setAttribute('src', translatedJSON.file);
+
+    });
+    catPhotos.addEventListener('loadend', function () {
+      const $cell = document.getElementById(cellData.ID);
+      const $cellLoader = $cell.querySelector('.loading-container');
+      $cellLoader.setAttribute('class', 'hidden');
     });
     catPhotos.addEventListener('error', () => {
-      if (errorCount === 0) {
-        const err = document.createElement('div');
-        err.textContent = 'You are not connected to the internet';
-        loadingModal.querySelector('.loading-icon').appendChild(err);
-        errorCount++;
-      }
+      console.log('err');
 
     });
     catPhotos.open('GET', 'https://aws.random.cat/meow');
@@ -64,26 +70,26 @@ function getRandomImages(amount) {
 
   }
   if (data.view === 'main-view') {
-    assignCellstoColumn(catImages.entries, $imageColumns);
+    assignCellstoColumn(catImages.cells, $imageColumns);
   }
 }
 
 function loadCatPhotos(e) {
 
-  const translatedJSON = JSON.parse(e.responseText);
+  // const translatedJSON = JSON.parse(e.responseText);
 
   const cellData = {};
   cellData.ID = data.nextID; // The Cell ID
-  cellData.imageURL = translatedJSON.file; // The Image URL
-  for (let i = 0; i < data.favorites.length; i++) {
-    if (cellData.imageURL === data.favorites[i].imageURL) {
-      cellData.favorited = true;
-      break;
-    } else {
-      cellData.favorited = false;
-    }
-  }
-  const cell = createImageCell(translatedJSON.file, data.nextID, cellData.favorited);
+  // cellData.imageURL = translatedJSON.file; // The Image URL
+  // for (let i = 0; i < data.favorites.length; i++) {
+  //   if (cellData.imageURL === data.favorites[i].imageURL) {
+  //     cellData.favorited = true;
+  //     break;
+  //   } else {
+  //     cellData.favorited = false;
+  //   }
+  // }
+  const cell = createImageCell(data.nextID, cellData.favorited);
   cellData.cell = cell; // The cell that shows up on the grid.Needed to get the heart on the grid view
 
   catImages.entries.push(cellData); // Shows current random entries. Length should not be larger than the amount parameter of the getRandomIMages function
@@ -122,7 +128,7 @@ function assignCellstoColumn(cellArray, columns) {
 
 // Creates the Cell container in the DOM
 
-function createImageCell(imageURL, id, favorited) {
+function createImageCell(id, favorited) {
   const $cell = document.createElement('div');
   const $imageBox = document.createElement('div');
   const $imageOverlay = document.createElement('div');
@@ -133,15 +139,23 @@ function createImageCell(imageURL, id, favorited) {
   const $pen = document.createElement('i');
   const $heart = document.createElement('i');
 
+  const $imageContainer = document.createElement('div');
+  const $loading = document.createElement('div');
+  const $loadingSpinner = document.createElement('i');
+
   $cell.setAttribute('class', 'cell');
   $cell.setAttribute('cell-id', id);
+  $cell.setAttribute('id', id);
   $imageBox.setAttribute('class', 'image-box');
   $imageOverlay.setAttribute('class', 'image-overlay');
-  $image.setAttribute('src', imageURL || './images/times-circle.svg');
   $image.setAttribute('class', 'cell-image');
   $image.setAttribute('image-id', id);
   $pen.setAttribute('icon', 'edit');
   $heart.setAttribute('icon', 'heart');
+
+  $imageContainer.setAttribute('class', 'image-container');
+  $loading.setAttribute('class', 'loading-container');
+  $loadingSpinner.setAttribute('class', 'loading-spinner fas fa-fan');
 
   if (favorited) {
     $pen.setAttribute('class', 'fas fa-pen');
@@ -152,9 +166,12 @@ function createImageCell(imageURL, id, favorited) {
   }
 
   $cell.appendChild($imageBox);
-  $imageBox.appendChild($imgA);
+  $imageBox.appendChild($imageContainer);
+  $imageContainer.appendChild($imgA);
   $imageBox.appendChild($imageOverlay);
   $imgA.appendChild($image);
+  $imgA.appendChild($loading);
+  $loading.appendChild($loadingSpinner);
   $imageOverlay.appendChild($penA);
   $imageOverlay.appendChild($heartA);
   $penA.appendChild($pen);
