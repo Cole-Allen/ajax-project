@@ -28,8 +28,6 @@ const $canvas = document.querySelector('canvas');
 const $memeSaveButton = document.querySelector('.meme-form .download-meme');
 
 const ctx = $canvas.getContext('2d');
-const loadingModal = document.querySelector('.loading-modal');
-let errorCount = 0;
 
 switchViews(data.view);
 
@@ -43,55 +41,39 @@ $headerLogo.addEventListener('click', function (event) {
 
 function getRandomImages(amount) {
   for (let i = 0; i < amount; i++) {
+    const cellData = {};
+    cellData.ID = data.nextID; // The Cell ID
+    data.nextID++;
+    const cell = createImageCell(cellData.ID, cellData.favorited);
+
+    catImages.entries.push(cellData); // Shows current random entries. Length should not be larger than the amount parameter of the getRandomIMages function
+    catImages.cells.push(cell);
     const catPhotos = new XMLHttpRequest();
     catPhotos.addEventListener('load', function () {
-      loadCatPhotos(this);
-      if (i === randAmount - 1) {
-        loadingModal.classList.add('hidden');
-      }
+      const translatedJSON = JSON.parse(this.responseText);
+      const $cell = document.getElementById(cellData.ID);
+      const $cellImage = $cell.querySelector('.cell-image');
+      $cellImage.setAttribute('src', translatedJSON.file);
+
+    });
+    catPhotos.addEventListener('loadend', function () {
+      const $cell = document.getElementById(cellData.ID);
+      const $cellLoader = $cell.querySelector('.loading-container');
+      const $placeholder = $cell.querySelector('.placeholder');
+
+      $placeholder.setAttribute('class', 'hidden');
+      $cellLoader.setAttribute('class', 'hidden');
     });
     catPhotos.addEventListener('error', () => {
-      if (errorCount === 0) {
-        const err = document.createElement('div');
-        err.textContent = 'You are not connected to the internet';
-        loadingModal.querySelector('.loading-icon').appendChild(err);
-        errorCount++;
-      }
-
+      // tba
     });
     catPhotos.open('GET', 'https://aws.random.cat/meow');
     catPhotos.send();
 
   }
   if (data.view === 'main-view') {
-    assignCellstoColumn(catImages.entries, $imageColumns);
+    assignCellstoColumn(catImages.cells, $imageColumns);
   }
-}
-
-function loadCatPhotos(e) {
-
-  const translatedJSON = JSON.parse(e.responseText);
-
-  const cellData = {};
-  cellData.ID = data.nextID; // The Cell ID
-  cellData.imageURL = translatedJSON.file; // The Image URL
-  for (let i = 0; i < data.favorites.length; i++) {
-    if (cellData.imageURL === data.favorites[i].imageURL) {
-      cellData.favorited = true;
-      break;
-    } else {
-      cellData.favorited = false;
-    }
-  }
-  const cell = createImageCell(translatedJSON.file, data.nextID, cellData.favorited);
-  cellData.cell = cell; // The cell that shows up on the grid.Needed to get the heart on the grid view
-
-  catImages.entries.push(cellData); // Shows current random entries. Length should not be larger than the amount parameter of the getRandomIMages function
-  catImages.cells.push(cell);
-  data.nextID++; // Makes sure no cells share the same id
-
-  // $imagegrid.appendChild(cell); // Adds the Cell to the grid view
-  assignCellstoColumn(catImages.cells, $imageColumns);
 }
 
 function assignCellstoColumn(cellArray, columns) {
@@ -122,7 +104,7 @@ function assignCellstoColumn(cellArray, columns) {
 
 // Creates the Cell container in the DOM
 
-function createImageCell(imageURL, id, favorited) {
+function createImageCell(id, favorited) {
   const $cell = document.createElement('div');
   const $imageBox = document.createElement('div');
   const $imageOverlay = document.createElement('div');
@@ -133,15 +115,25 @@ function createImageCell(imageURL, id, favorited) {
   const $pen = document.createElement('i');
   const $heart = document.createElement('i');
 
+  const $imageContainer = document.createElement('div');
+  const $loading = document.createElement('div');
+  const $loadingSpinner = document.createElement('i');
+  const $placeholder = document.createElement('div');
+
   $cell.setAttribute('class', 'cell');
   $cell.setAttribute('cell-id', id);
+  $cell.setAttribute('id', id);
   $imageBox.setAttribute('class', 'image-box');
   $imageOverlay.setAttribute('class', 'image-overlay');
-  $image.setAttribute('src', imageURL || './images/times-circle.svg');
   $image.setAttribute('class', 'cell-image');
   $image.setAttribute('image-id', id);
   $pen.setAttribute('icon', 'edit');
   $heart.setAttribute('icon', 'heart');
+
+  $imageContainer.setAttribute('class', 'image-container');
+  $loading.setAttribute('class', 'loading-container');
+  $loadingSpinner.setAttribute('class', 'loading-spinner fas fa-fan');
+  $placeholder.setAttribute('class', 'placeholder');
 
   if (favorited) {
     $pen.setAttribute('class', 'fas fa-pen');
@@ -152,9 +144,13 @@ function createImageCell(imageURL, id, favorited) {
   }
 
   $cell.appendChild($imageBox);
-  $imageBox.appendChild($imgA);
+  $imageBox.appendChild($imageContainer);
+  $imageContainer.appendChild($imgA);
   $imageBox.appendChild($imageOverlay);
   $imgA.appendChild($image);
+  $imgA.appendChild($loading);
+  $imgA.appendChild($placeholder);
+  $loading.appendChild($loadingSpinner);
   $imageOverlay.appendChild($penA);
   $imageOverlay.appendChild($heartA);
   $penA.appendChild($pen);
@@ -187,6 +183,7 @@ function favoriteHandler(event) {
   for (let i = 0; i < catImages.entries.length; i++) {
     if (event.currentTarget.getAttribute('cell-id') === catImages.entries[i].ID.toString()) {
       catImages.entries[i].favorited = true;
+      catImages.entries[i].imageURL = event.currentTarget.querySelector('.cell-image').getAttribute('src');
       data.favorites.push(catImages.entries[i]);
       event.target.classList.remove('far');
       event.target.classList.add('fas');
@@ -219,9 +216,9 @@ function modalHandler(targetCell) {
   let cellDataM = null;
   const $heart = $modal.querySelector('.fa-heart');
   const $cellHeart = targetCell.querySelector('.fa-heart'); // Links the heart effect to the grid view cell
-  for (let p = 0; p < catImages.entries.length; p++) {
-    if (catImages.entries[p].ID.toString() === targetCell.getAttribute('cell-id')) {
-      cellDataM = catImages.entries[p];
+  for (let i = 0; i < catImages.entries.length; i++) {
+    if (catImages.entries[i].ID.toString() === targetCell.getAttribute('cell-id')) {
+      cellDataM = catImages.entries[i];
     }
   }
 
@@ -269,6 +266,10 @@ function modalHandler(targetCell) {
 
 function switchViews(targetview) {
   data.view = targetview;
+  catImages = {
+    entries: [],
+    cells: []
+  };
   for (let d = 0; d < $imageColumns.length; d++) {
     while ($imageColumns[d].firstChild) {
       $imageColumns[d].removeChild($imageColumns[d].firstChild);
@@ -288,18 +289,25 @@ function switchViews(targetview) {
     }
   }
   if (targetview === 'favorites') {
+    catImages.entries = data.favorites;
     $headerFavorites.classList.add('favorites-view');
     const favoriteCells = [];
-    for (let j = 0; j < data.favorites.length; j++) {
-      favoriteCells.push(createImageCell(data.favorites[j].imageURL, data.favorites[j].ID, data.favorites[j].favorited));
+    for (let i = 0; i < data.favorites.length; i++) {
+      favoriteCells.push(createImageCell(data.favorites[i].ID, data.favorites[i].favorited));
     }
     assignCellstoColumn(favoriteCells, $favImageColumns);
+    for (let i = 0; i < data.favorites.length; i++) {
+      const $favCell = document.getElementById(data.favorites[i].ID);
+      const $favCellImage = $favCell.querySelector('.cell-image');
+      const $spinner = $favCell.querySelector('.loading-container');
+      const $placeholder = $favCell.querySelector('.placeholder');
+      $spinner.classList.add('hidden');
+      $favCellImage.setAttribute('src', data.favorites[i].imageURL);
+      $placeholder.setAttribute('class', 'hidden');
+    }
+
   } else {
     $headerFavorites.classList.remove('favorites-view');
-    catImages = {
-      entries: [],
-      cells: []
-    };
     getRandomImages(randAmount);
   }
 }
