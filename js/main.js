@@ -65,8 +65,7 @@ function getRandomImages(amount) {
       $cellLoader.setAttribute('class', 'hidden');
     });
     catPhotos.addEventListener('error', () => {
-      console.log('err');
-
+      // tba
     });
     catPhotos.open('GET', 'https://aws.random.cat/meow');
     catPhotos.send();
@@ -217,9 +216,9 @@ function modalHandler(targetCell) {
   let cellDataM = null;
   const $heart = $modal.querySelector('.fa-heart');
   const $cellHeart = targetCell.querySelector('.fa-heart'); // Links the heart effect to the grid view cell
-  for (let p = 0; p < catImages.entries.length; p++) {
-    if (catImages.entries[p].ID.toString() === targetCell.getAttribute('cell-id')) {
-      cellDataM = catImages.entries[p];
+  for (let i = 0; i < catImages.entries.length; i++) {
+    if (catImages.entries[i].ID.toString() === targetCell.getAttribute('cell-id')) {
+      cellDataM = catImages.entries[i];
     }
   }
 
@@ -267,6 +266,10 @@ function modalHandler(targetCell) {
 
 function switchViews(targetview) {
   data.view = targetview;
+  catImages = {
+    entries: [],
+    cells: []
+  };
   for (let d = 0; d < $imageColumns.length; d++) {
     while ($imageColumns[d].firstChild) {
       $imageColumns[d].removeChild($imageColumns[d].firstChild);
@@ -286,6 +289,7 @@ function switchViews(targetview) {
     }
   }
   if (targetview === 'favorites') {
+    catImages.entries = data.favorites;
     $headerFavorites.classList.add('favorites-view');
     const favoriteCells = [];
     for (let i = 0; i < data.favorites.length; i++) {
@@ -304,10 +308,6 @@ function switchViews(targetview) {
 
   } else {
     $headerFavorites.classList.remove('favorites-view');
-    catImages = {
-      entries: [],
-      cells: []
-    };
     getRandomImages(randAmount);
   }
 }
