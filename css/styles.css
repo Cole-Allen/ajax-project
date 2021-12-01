@@ -142,8 +142,6 @@ a {
 
 .image-container {
   position: relative;
-
-  /* min-height: 200px; */
 }
 
 .loading-container {
@@ -162,6 +160,10 @@ a {
   animation: loading-spinner 1.2s infinite;
   transform-origin: center;
   font-size: 500%;
+}
+
+.placeholder {
+  height: 200px;
 }
 
 @keyframes loading-spinner {

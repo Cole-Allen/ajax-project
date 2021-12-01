@@ -59,6 +59,9 @@ function getRandomImages(amount) {
     catPhotos.addEventListener('loadend', function () {
       const $cell = document.getElementById(cellData.ID);
       const $cellLoader = $cell.querySelector('.loading-container');
+      const $placeholder = $cell.querySelector('.placeholder');
+
+      $placeholder.setAttribute('class', 'hidden');
       $cellLoader.setAttribute('class', 'hidden');
     });
     catPhotos.addEventListener('error', () => {
@@ -72,32 +75,6 @@ function getRandomImages(amount) {
   if (data.view === 'main-view') {
     assignCellstoColumn(catImages.cells, $imageColumns);
   }
-}
-
-function loadCatPhotos(e) {
-
-  // const translatedJSON = JSON.parse(e.responseText);
-
-  const cellData = {};
-  cellData.ID = data.nextID; // The Cell ID
-  // cellData.imageURL = translatedJSON.file; // The Image URL
-  // for (let i = 0; i < data.favorites.length; i++) {
-  //   if (cellData.imageURL === data.favorites[i].imageURL) {
-  //     cellData.favorited = true;
-  //     break;
-  //   } else {
-  //     cellData.favorited = false;
-  //   }
-  // }
-  const cell = createImageCell(data.nextID, cellData.favorited);
-  cellData.cell = cell; // The cell that shows up on the grid.Needed to get the heart on the grid view
-
-  catImages.entries.push(cellData); // Shows current random entries. Length should not be larger than the amount parameter of the getRandomIMages function
-  catImages.cells.push(cell);
-  data.nextID++; // Makes sure no cells share the same id
-
-  // $imagegrid.appendChild(cell); // Adds the Cell to the grid view
-  assignCellstoColumn(catImages.cells, $imageColumns);
 }
 
 function assignCellstoColumn(cellArray, columns) {
@@ -142,6 +119,7 @@ function createImageCell(id, favorited) {
   const $imageContainer = document.createElement('div');
   const $loading = document.createElement('div');
   const $loadingSpinner = document.createElement('i');
+  const $placeholder = document.createElement('div');
 
   $cell.setAttribute('class', 'cell');
   $cell.setAttribute('cell-id', id);
@@ -156,6 +134,7 @@ function createImageCell(id, favorited) {
   $imageContainer.setAttribute('class', 'image-container');
   $loading.setAttribute('class', 'loading-container');
   $loadingSpinner.setAttribute('class', 'loading-spinner fas fa-fan');
+  $placeholder.setAttribute('class', 'placeholder');
 
   if (favorited) {
     $pen.setAttribute('class', 'fas fa-pen');
@@ -171,6 +150,7 @@ function createImageCell(id, favorited) {
   $imageBox.appendChild($imageOverlay);
   $imgA.appendChild($image);
   $imgA.appendChild($loading);
+  $imgA.appendChild($placeholder);
   $loading.appendChild($loadingSpinner);
   $imageOverlay.appendChild($penA);
   $imageOverlay.appendChild($heartA);
@@ -204,6 +184,7 @@ function favoriteHandler(event) {
   for (let i = 0; i < catImages.entries.length; i++) {
     if (event.currentTarget.getAttribute('cell-id') === catImages.entries[i].ID.toString()) {
       catImages.entries[i].favorited = true;
+      catImages.entries[i].imageURL = event.currentTarget.querySelector('.cell-image').getAttribute('src');
       data.favorites.push(catImages.entries[i]);
       event.target.classList.remove('far');
       event.target.classList.add('fas');
@@ -307,10 +288,20 @@ function switchViews(targetview) {
   if (targetview === 'favorites') {
     $headerFavorites.classList.add('favorites-view');
     const favoriteCells = [];
-    for (let j = 0; j < data.favorites.length; j++) {
-      favoriteCells.push(createImageCell(data.favorites[j].imageURL, data.favorites[j].ID, data.favorites[j].favorited));
+    for (let i = 0; i < data.favorites.length; i++) {
+      favoriteCells.push(createImageCell(data.favorites[i].ID, data.favorites[i].favorited));
     }
     assignCellstoColumn(favoriteCells, $favImageColumns);
+    for (let i = 0; i < data.favorites.length; i++) {
+      const $favCell = document.getElementById(data.favorites[i].ID);
+      const $favCellImage = $favCell.querySelector('.cell-image');
+      const $spinner = $favCell.querySelector('.loading-container');
+      const $placeholder = $favCell.querySelector('.placeholder');
+      $spinner.classList.add('hidden');
+      $favCellImage.setAttribute('src', data.favorites[i].imageURL);
+      $placeholder.setAttribute('class', 'hidden');
+    }
+
   } else {
     $headerFavorites.classList.remove('favorites-view');
     catImages = {
