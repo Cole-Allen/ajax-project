@@ -44,15 +44,14 @@ function getRandomImages(amount) {
     const cellData = {};
     cellData.ID = data.nextID; // The Cell ID
     data.nextID++;
-    const cell = createImageCell(cellData.ID, cellData.favorited);
-
-    catImages.entries.push(cellData); // Shows current random entries. Length should not be larger than the amount parameter of the getRandomIMages function
+    const cell = createImageCell(cellData.ID, false, false);
     catImages.cells.push(cell);
     const catPhotos = new XMLHttpRequest();
     catPhotos.addEventListener('load', function () {
       const translatedJSON = JSON.parse(this.responseText);
       const $cell = document.getElementById(cellData.ID);
       const $cellImage = $cell.querySelector('.cell-image');
+      catImages.entries.push(translatedJSON.file);
       $cellImage.setAttribute('src', translatedJSON.file);
 
     });
@@ -65,7 +64,7 @@ function getRandomImages(amount) {
       $cellLoader.setAttribute('class', 'hidden');
     });
     catPhotos.addEventListener('error', () => {
-      // tba
+      // tba ewrror  picture
     });
     catPhotos.open('GET', 'https://aws.random.cat/meow');
     catPhotos.send();
@@ -104,7 +103,7 @@ function assignCellstoColumn(cellArray, columns) {
 
 // Creates the Cell container in the DOM
 
-function createImageCell(id, favorited) {
+function createImageCell(id, url, favorited) {
   const $cell = document.createElement('div');
   const $imageBox = document.createElement('div');
   const $imageOverlay = document.createElement('div');
@@ -132,8 +131,15 @@ function createImageCell(id, favorited) {
 
   $imageContainer.setAttribute('class', 'image-container');
   $loading.setAttribute('class', 'loading-container');
-  $loadingSpinner.setAttribute('class', 'loading-spinner fas fa-fan');
-  $placeholder.setAttribute('class', 'placeholder');
+
+  if (url) {
+    $image.setAttribute('src', url);
+    $loading.setAttribute('class', 'loading-container hidden');
+  } else {
+
+    $loadingSpinner.setAttribute('class', 'loading-spinner fas fa-fan');
+    $placeholder.setAttribute('class', 'placeholder');
+  }
 
   if (favorited) {
     $pen.setAttribute('class', 'fas fa-pen');
@@ -163,15 +169,22 @@ function createImageCell(id, favorited) {
 }
 
 function cellEventListener(event) {
-
+  const id = event.currentTarget.getAttribute('id');
   if (event.target.getAttribute('icon') === 'heart') {
-    for (let i = 0; i < data.favorites.length; i++) {
-      if (data.favorites[i].ID.toString() === event.currentTarget.getAttribute('cell-id')) {
-        unfavoriteHandler(event);
+    const $url = event.currentTarget.querySelector('.cell-image').getAttribute('src');
+    for (const i of data.favorites) {
+      if (i.image === $url) {
+        event.target.classList.remove('fas');
+        event.target.classList.add('far');
+        event.target.classList.remove('faved');
+        unfavoriteHandler(id, $url);
         return;
       }
     }
-    favoriteHandler(event);
+    event.target.classList.remove('far');
+    event.target.classList.add('fas');
+    event.target.classList.add('faved');
+    favoriteHandler(id, $url);
   } else if (event.target.getAttribute('icon') === 'edit') {
     openPhotoInMemeView(event.currentTarget.querySelector('.cell-image').getAttribute('src'));
   } else if (event.target.getAttribute('src')) {
@@ -179,90 +192,72 @@ function cellEventListener(event) {
   }
 }
 
-function favoriteHandler(event) {
-  for (let i = 0; i < catImages.entries.length; i++) {
-    if (event.currentTarget.getAttribute('cell-id') === catImages.entries[i].ID.toString()) {
-      catImages.entries[i].favorited = true;
-      catImages.entries[i].imageURL = event.currentTarget.querySelector('.cell-image').getAttribute('src');
-      data.favorites.push(catImages.entries[i]);
-      event.target.classList.remove('far');
-      event.target.classList.add('fas');
-      event.target.classList.add('faved');
-    }
-  }
+function favoriteHandler(id, url) {
+  data.favorites.push({
+    id: id,
+    image: url
+  });
 }
 
-function unfavoriteHandler(event) {
-
-  for (let i = 0; i < data.favorites.length; i++) {
-    if (event.currentTarget.getAttribute('cell-id') === data.favorites[i].ID.toString()) {
-      data.favorites[i].favorited = false;
-      data.favorites.splice(data.favorites.indexOf(data.favorites[i]), 1);
-      event.target.classList.remove('fas');
-      event.target.classList.add('far');
-      event.target.classList.remove('faved');
+function unfavoriteHandler(id, url) {
+  for (const i of data.favorites) {
+    if (i.image === url) {
+      data.favorites.splice(data.favorites.indexOf(i), 1);
     }
   }
 }
 
 function whenImageClicked(url, targetCell) {
+  const $heart = $modal.querySelector('.fa-heart');
+  $heart.setAttribute('class', `${targetCell.querySelector('.fa-heart').getAttribute('class')}`);
+
+  data.selectedCell = targetCell;
+  data.selectedCell.image = url;
   $modal.classList.remove('hidden');
   $modal.querySelector('img').setAttribute('src', url);
-  modalHandler(targetCell);
-
 }
 
-function modalHandler(targetCell) {
-  let cellDataM = null;
+$modal.addEventListener('click', function (event) {
+  const $cellHeart = data.selectedCell.querySelector('.fa-heart');
   const $heart = $modal.querySelector('.fa-heart');
-  const $cellHeart = targetCell.querySelector('.fa-heart'); // Links the heart effect to the grid view cell
-  for (let i = 0; i < catImages.entries.length; i++) {
-    if (catImages.entries[i].ID.toString() === targetCell.getAttribute('cell-id')) {
-      cellDataM = catImages.entries[i];
-    }
-  }
 
-  if (cellDataM.favorited) {
-    $heart.classList.remove('far');
-    $heart.classList.add('fas');
-    $heart.classList.add('faved');
-  } else {
-    $heart.classList.add('far');
-    $heart.classList.remove('fas');
-    $heart.classList.remove('faved');
-  }
-
-  $modal.addEventListener('click', function (event) {
-    if (event.target === $modal.querySelector('.fa-times-circle')) {
+  switch (event.target.getAttribute('data-mod')) {
+    case 'cancel':
       $modal.classList.add('hidden');
-    } else if (event.target === $modal.querySelector('.fa-pen')) {
+      break;
+    case 'download':
+      $modal.querySelector('.download-anchor').setAttribute('href', data.selectedCell.imageURL);
+      break;
+    case 'pen':
       $modal.classList.add('hidden');
-      openPhotoInMemeView(targetCell.querySelector('.cell-image').getAttribute('src'));
-    } else if (event.target === $modal.querySelector('.fa-download')) {
-      $modal.querySelector('.download-anchor').setAttribute('href', cellDataM.imageURL);
-    } else if (event.target === $heart) {
-      if (data.favorites.includes(cellDataM)) {
-        cellDataM.favorited = false;
-        data.favorites.splice(data.favorites.indexOf(cellDataM), 1);
-        $cellHeart.classList.add('far');
-        $cellHeart.classList.remove('fas');
-        $cellHeart.classList.remove('faved');
-        $heart.classList.add('far');
-        $heart.classList.remove('fas');
-        $heart.classList.remove('faved');
-      } else {
-        cellDataM.favorited = true;
-        data.favorites.push(cellDataM);
-        $cellHeart.classList.remove('far');
-        $cellHeart.classList.add('fas');
-        $cellHeart.classList.add('faved');
-        $heart.classList.remove('far');
-        $heart.classList.add('fas');
-        $heart.classList.add('faved');
+      openPhotoInMemeView(data.selectedCell.imageURL);
+      break;
+    case 'heart':
+      for (const i of data.favorites) {
+        if (i.image === data.selectedCell.image) {
+          data.favorites.splice(data.favorites.indexOf(i), 1);
+          $cellHeart.classList.add('far');
+          $cellHeart.classList.remove('fas');
+          $cellHeart.classList.remove('faved');
+          $heart.classList.add('far');
+          $heart.classList.remove('fas');
+          $heart.classList.remove('faved');
+          return;
+        }
       }
-    }
-  });
-}
+      data.favorites.push({
+        id: data.selectedCell.getAttribute('id'),
+        image: data.selectedCell.image
+      });
+      $cellHeart.classList.remove('far');
+      $cellHeart.classList.add('fas');
+      $cellHeart.classList.add('faved');
+      $heart.classList.remove('far');
+      $heart.classList.add('fas');
+      $heart.classList.add('faved');
+      break;
+  }
+});
 
 function switchViews(targetview) {
   data.view = targetview;
@@ -293,18 +288,9 @@ function switchViews(targetview) {
     $headerFavorites.classList.add('favorites-view');
     const favoriteCells = [];
     for (let i = 0; i < data.favorites.length; i++) {
-      favoriteCells.push(createImageCell(data.favorites[i].ID, data.favorites[i].favorited));
+      favoriteCells.push(createImageCell(data.favorites[i].ID, data.favorites[i].image, true));
     }
     assignCellstoColumn(favoriteCells, $favImageColumns);
-    for (let i = 0; i < data.favorites.length; i++) {
-      const $favCell = document.getElementById(data.favorites[i].ID);
-      const $favCellImage = $favCell.querySelector('.cell-image');
-      const $spinner = $favCell.querySelector('.loading-container');
-      const $placeholder = $favCell.querySelector('.placeholder');
-      $spinner.classList.add('hidden');
-      $favCellImage.setAttribute('src', data.favorites[i].imageURL);
-      $placeholder.setAttribute('class', 'hidden');
-    }
 
   } else {
     $headerFavorites.classList.remove('favorites-view');

@@ -5,7 +5,7 @@ let data = {
   nextID: 0,
   view: 'main-view',
   meme: null,
-  dark: false
+  dark: true
 };
 
 window.addEventListener('beforeunload', function (event) {
